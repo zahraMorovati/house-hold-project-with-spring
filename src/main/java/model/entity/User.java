@@ -7,11 +7,9 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
-@Builder
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @MappedSuperclass
 public class User {
 
