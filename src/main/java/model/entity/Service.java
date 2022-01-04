@@ -1,11 +1,11 @@
 package model.entity;
 
 import lombok.*;
-import model.enums.SubService;
+import model.enums.ServiceTypes;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.util.Objects;
-@Builder
+@Builder(setterPrefix = "set")
 @Getter
 @Setter
 @ToString
@@ -16,9 +16,10 @@ public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String name;
-    @Column(unique = true)
-    private SubService subService;
+    @Enumerated(value = EnumType.STRING)
+    private ServiceTypes service;
+    @Column(unique = true,length = 25)
+    private String subService;
     private double price;
     @Lob
     private String explanations; //توضیحات
