@@ -8,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Objects;
-@Builder
+@Builder(setterPrefix = "set")
 @Getter
 @Setter
 @ToString
@@ -20,7 +20,7 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String city;
-    private String state; //استان
+    private String cityState; //استان
     private String plaque;
     private String explanations;
 
