@@ -10,6 +10,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@RequiredArgsConstructor
 @MappedSuperclass
 public class User {
 
@@ -18,7 +19,7 @@ public class User {
     private int id;
     private String name;
     private String family;
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false,length = 25)
     private String email;
     @Column(nullable = false, length = 8)
     private String password;
@@ -26,6 +27,7 @@ public class User {
     private UserState state;
     @Temporal(TemporalType.TIMESTAMP)
     private Date RegistrationDate;
+    private double balance;
 
     @Override
     public boolean equals(Object o) {
