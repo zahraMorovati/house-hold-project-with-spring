@@ -1,6 +1,6 @@
 package model.enums;
 
-public enum SubService {
+public enum ServiceTypes {
 
     //todo
 }
