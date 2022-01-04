@@ -5,7 +5,7 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.util.Objects;
 
-@Builder
+@Builder(setterPrefix = "set")
 @Getter
 @Setter
 @ToString
@@ -18,7 +18,7 @@ public class Manager {
     private int id;
     private String name;
     private String family;
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false,length = 25)
     private String email;
     @Column(nullable = false, length = 8)
     private String password;
