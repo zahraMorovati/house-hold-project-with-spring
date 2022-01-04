@@ -5,7 +5,7 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Objects;
-@Builder
+@Builder(setterPrefix = "set")
 @Getter
 @Setter
 @ToString
@@ -17,7 +17,6 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private double point;
-    @Lob
     private String comment;
 
     @Override
