@@ -1,9 +1,6 @@
 package util;
 
-import model.entity.Customer;
-import model.entity.Manager;
-import model.entity.Service;
-import model.entity.Specialist;
+import model.entity.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -20,8 +17,9 @@ public class HibernateUtil {
         if (sessionFactory == null) {
 
             try {
+                DatabaseUtil.creatDatabase();
                 Configuration configuration = new Configuration();
-
+                configuration.setPhysicalNamingStrategy(new SnakeCasePhysicalNamingStrategy());
                 Properties settings = new Properties();
                 settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
                 settings.put(Environment.URL, "jdbc:mysql://localhost:3306/maktab_58_db?useSSL=false");
@@ -36,10 +34,14 @@ public class HibernateUtil {
                 settings.put(Environment.HBM2DDL_AUTO, "update");
 
                 configuration.setProperties(settings);
+                configuration.addAnnotatedClass(Address.class);
+                configuration.addAnnotatedClass(Comment.class);
                 configuration.addAnnotatedClass(Customer.class);
                 configuration.addAnnotatedClass(Manager.class);
+                configuration.addAnnotatedClass(Order.class);
                 configuration.addAnnotatedClass(Service.class);
                 configuration.addAnnotatedClass(Specialist.class);
+                configuration.addAnnotatedClass(Suggestion.class);
 
 
                 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
