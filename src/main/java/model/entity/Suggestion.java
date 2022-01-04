@@ -6,7 +6,7 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
-@Builder
+@Builder(setterPrefix = "set")
 @Getter
 @Setter
 @ToString
