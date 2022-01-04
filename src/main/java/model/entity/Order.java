@@ -7,17 +7,18 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
-@Builder
+@Builder(setterPrefix = "set")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int orderId;
     @OneToOne
     private Service service;
     private double suggestedPrice;
@@ -29,9 +30,13 @@ public class Order {
     @OneToOne
     private Address address;
     @Enumerated(value = EnumType.STRING)
-    private OrderState state;
+    private OrderState orderState;
     @OneToOne
     private Suggestion suggestion;
+    @ManyToOne(cascade = {CascadeType.ALL})
+    private Customer customer;
+    @OneToOne
+    private Comment comment;
 
 
     @Override
@@ -39,7 +44,7 @@ public class Order {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Order order = (Order) o;
-        return id != 0 && Objects.equals(id, order.id);
+        return orderId != 0 && Objects.equals(orderId, order.orderId);
     }
 
     @Override
