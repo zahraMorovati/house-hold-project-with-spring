@@ -1,6 +1,8 @@
 package model.entity;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import model.enums.UserState;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
@@ -8,14 +10,14 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-@Builder
+
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
 public class Specialist extends User {
     @Lob
@@ -24,18 +26,89 @@ public class Specialist extends User {
     @OneToMany
     @ToString.Exclude
     private List<Service> services = new ArrayList<>();
-    private double balance;
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Specialist that = (Specialist) o;
-        return super.getId()!= 0 && Objects.equals(super.getId(), that.getId());
+        return getId() != 0 && Objects.equals(getId(), that.getId());
     }
 
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+
+    public static final class SpecialistBuilder {
+        private Specialist specialist;
+
+        private SpecialistBuilder() {
+            specialist = new Specialist();
+        }
+
+        public static SpecialistBuilder aSpecialist() {
+            return new SpecialistBuilder();
+        }
+
+        public SpecialistBuilder setImage(byte[] image) {
+            specialist.setImage(image);
+            return this;
+        }
+
+        public SpecialistBuilder setServices(List<Service> services) {
+            specialist.setServices(services);
+            return this;
+        }
+
+        public SpecialistBuilder setId(int id) {
+            specialist.setId(id);
+            return this;
+        }
+
+        public SpecialistBuilder setName(String name) {
+            specialist.setName(name);
+            return this;
+        }
+
+        public SpecialistBuilder setFamily(String family) {
+            specialist.setFamily(family);
+            return this;
+        }
+
+        public SpecialistBuilder setEmail(String email) {
+            specialist.setEmail(email);
+            return this;
+        }
+
+        public SpecialistBuilder setPassword(String password) {
+            specialist.setPassword(password);
+            return this;
+        }
+
+        public SpecialistBuilder setState(UserState state) {
+            specialist.setState(state);
+            return this;
+        }
+
+        public SpecialistBuilder setRegistrationDate(Date RegistrationDate) {
+            specialist.setRegistrationDate(RegistrationDate);
+            return this;
+        }
+
+        public SpecialistBuilder setBalance(double balance) {
+            specialist.setBalance(balance);
+            return this;
+        }
+
+        public SpecialistBuilder but() {
+            return aSpecialist().setImage(specialist.getImage()).setServices(specialist.getServices()).setId(specialist.getId()).setName(specialist.getName()).setFamily(specialist.getFamily()).setEmail(specialist.getEmail()).setPassword(specialist.getPassword()).setState(specialist.getState()).setRegistrationDate(specialist.getRegistrationDate()).setBalance(specialist.getBalance());
+        }
+
+        public Specialist build() {
+            return specialist;
+        }
     }
 }
