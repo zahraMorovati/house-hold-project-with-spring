@@ -2,6 +2,7 @@ package model.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,7 +18,7 @@ public class Suggestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Temporal(value = TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date date;
     private double suggestedPrice;
     private double workHour;
