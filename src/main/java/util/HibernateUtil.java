@@ -39,7 +39,7 @@ public class HibernateUtil {
                 configuration.addAnnotatedClass(Customer.class);
                 configuration.addAnnotatedClass(Manager.class);
                 configuration.addAnnotatedClass(Order.class);
-                configuration.addAnnotatedClass(Service.class);
+                configuration.addAnnotatedClass(HomeService.class);
                 configuration.addAnnotatedClass(Specialist.class);
                 configuration.addAnnotatedClass(Suggestion.class);
 
