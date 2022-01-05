@@ -20,7 +20,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderId;
     @OneToOne
-    private Service service;
+    private HomeService service;
     private double suggestedPrice;
     private String explanations;
     @Temporal(value = TemporalType.TIMESTAMP)

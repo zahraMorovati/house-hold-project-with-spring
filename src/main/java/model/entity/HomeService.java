@@ -1,7 +1,7 @@
 package model.entity;
 
 import lombok.*;
-import model.enums.ServiceTypes;
+import model.enums.HomeServiceTypes;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.util.Objects;
@@ -12,12 +12,12 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Service {
+public class HomeService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Enumerated(value = EnumType.STRING)
-    private ServiceTypes service;
+    private HomeServiceTypes service;
     @Column(unique = true,length = 25)
     private String subService;
     private double price;
@@ -28,7 +28,7 @@ public class Service {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Service service = (Service) o;
+        HomeService service = (HomeService) o;
         return id != 0 && Objects.equals(id, service.id);
     }
 

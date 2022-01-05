@@ -1,8 +1,7 @@
 package dao;
 
-import dao.interfaces.ServiceDao;
-import model.entity.Customer;
-import model.entity.Service;
+import dao.interfaces.HomeServiceDao;
+import model.entity.HomeService;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -11,12 +10,12 @@ import util.HibernateUtil;
 
 import java.util.List;
 
-public class ServiceDaoImpl implements ServiceDao {
+public class HomeServiceDaoImpl implements HomeServiceDao {
 
     private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
     @Override
-    public void save(Service service) {
+    public void save(HomeService service) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         session.save(service);
@@ -25,7 +24,7 @@ public class ServiceDaoImpl implements ServiceDao {
     }
 
     @Override
-    public void delete(Service service) {
+    public void delete(HomeService service) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         session.delete(service);
@@ -34,7 +33,7 @@ public class ServiceDaoImpl implements ServiceDao {
     }
 
     @Override
-    public void update(Service service) {
+    public void update(HomeService service) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         session.update(service);
@@ -43,23 +42,23 @@ public class ServiceDaoImpl implements ServiceDao {
     }
 
     @Override
-    public List<Service> getServiceById(int id) {
+    public List<HomeService> getServiceById(int id) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query<Service> query = session.createQuery("from Service s where s.id=:id");
+        Query<HomeService> query = session.createQuery("from HomeService s where s.id=:id");
         query.setParameter("id", id);
-        List<Service> results = query.getResultList();
+        List<HomeService> results = query.getResultList();
         transaction.commit();
         session.close();
         return results;
     }
 
     @Override
-    public List<Service> getAllServices() {
+    public List<HomeService> getAllServices() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query<Service> query = session.createQuery("from Service");
-        List<Service> results = query.getResultList();
+        Query<HomeService> query = session.createQuery("from HomeService");
+        List<HomeService> results = query.getResultList();
         transaction.commit();
         session.close();
         return results;
