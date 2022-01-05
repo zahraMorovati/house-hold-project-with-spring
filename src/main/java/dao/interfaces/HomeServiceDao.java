@@ -14,4 +14,6 @@ public interface HomeServiceDao {
     List<HomeService> getServiceById(int id);
 
     List<HomeService> getAllServices();
+
+    int getSpecialistById(int id , HomeService homeService);
 }
