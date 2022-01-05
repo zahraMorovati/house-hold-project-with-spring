@@ -3,6 +3,7 @@ package model.entity;
 import lombok.*;
 import model.enums.UserState;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
@@ -25,7 +26,7 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserState state;
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date RegistrationDate;
     private double balance;
 
