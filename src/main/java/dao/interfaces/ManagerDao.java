@@ -1,5 +1,6 @@
 package dao.interfaces;
 
+import dto.ManagerDto;
 import model.entity.Manager;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface ManagerDao {
     List<Manager> getManagerById(int id);
 
     List<Manager> getManagerByEmailAndPassword(String email, String password);
+
+    List<ManagerDto> filter(String name, String family, String email, int maxResult, int firstResult);
 }
