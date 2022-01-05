@@ -1,5 +1,6 @@
 package dao.interfaces;
 
+import dto.UserDto;
 import model.entity.Specialist;
 
 import java.util.List;
@@ -13,5 +14,9 @@ public interface SpecialistDao {
 
     List<Specialist> getSpecialistById(int id);
 
+    List<Specialist> getSpecialistByEmailAndPassword(String email , String password);
+
     List<Specialist> getAllSpecialists();
+
+    List<UserDto> filter(String name, String family, String email, int maxResult, int firstResult);
 }
