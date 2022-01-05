@@ -63,4 +63,16 @@ public class HomeServiceDaoImpl implements HomeServiceDao {
         session.close();
         return results;
     }
+
+    @Override
+    public int getSpecialistById(int id, HomeService homeService) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        String sqlQuery = String.format("select home_service_id from home_service_specialist " +
+                        "where specialist_list_id='%d'",id);
+        int i = session.createSQLQuery(sqlQuery).getMaxResults();
+        transaction.commit();
+        session.close();
+        return i;
+    }
 }
