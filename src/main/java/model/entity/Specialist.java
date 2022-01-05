@@ -1,17 +1,10 @@
 package model.entity;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import model.enums.UserState;
 import org.hibernate.Hibernate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
+import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -23,10 +16,6 @@ public class Specialist extends User {
     @Lob
     @Column(length = 300_000,columnDefinition = "BLOB")
     private byte[] image;
-    @OneToMany
-    @ToString.Exclude
-    private List<Service> services = new ArrayList<>();
-
 
     @Override
     public boolean equals(Object o) {
@@ -55,11 +44,6 @@ public class Specialist extends User {
 
         public SpecialistBuilder setImage(byte[] image) {
             specialist.setImage(image);
-            return this;
-        }
-
-        public SpecialistBuilder setServices(List<Service> services) {
-            specialist.setServices(services);
             return this;
         }
 
@@ -104,7 +88,7 @@ public class Specialist extends User {
         }
 
         public SpecialistBuilder but() {
-            return aSpecialist().setImage(specialist.getImage()).setServices(specialist.getServices()).setId(specialist.getId()).setName(specialist.getName()).setFamily(specialist.getFamily()).setEmail(specialist.getEmail()).setPassword(specialist.getPassword()).setState(specialist.getState()).setRegistrationDate(specialist.getRegistrationDate()).setBalance(specialist.getBalance());
+            return aSpecialist().setImage(specialist.getImage()).setId(specialist.getId()).setName(specialist.getName()).setFamily(specialist.getFamily()).setEmail(specialist.getEmail()).setPassword(specialist.getPassword()).setState(specialist.getState()).setRegistrationDate(specialist.getRegistrationDate()).setBalance(specialist.getBalance());
         }
 
         public Specialist build() {
