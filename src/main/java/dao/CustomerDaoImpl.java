@@ -1,12 +1,19 @@
 package dao;
 
+import com.mysql.cj.util.StringUtils;
 import dao.interfaces.CustomerDao;
+import dto.UserDto;
 import model.entity.Customer;
+import model.entity.Manager;
 import model.entity.Order;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
+import org.hibernate.transform.Transformers;
 import util.HibernateUtil;
 
 import java.util.List;
@@ -55,6 +62,18 @@ public class CustomerDaoImpl implements CustomerDao {
     }
 
     @Override
+    public List<Customer> getCustomerByEmailAndPassword(String email, String password) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Query<Customer> query = session.createQuery("from Customer c where c.email=:email and c.password=:password");
+        query.setParameter("email", email);
+        query.setParameter("password", password);
+        List<Customer> results = query.getResultList();
+        transaction.commit();
+        session.close();
+        return results;    }
+
+    @Override
     public List<Customer> getAllCustomers() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
@@ -74,4 +93,42 @@ public class CustomerDaoImpl implements CustomerDao {
         transaction.commit();
         session.close();
     }
+
+    @Override
+    public List<UserDto> filter(String name, String family, String email, int maxResult, int firstResult) {
+
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Criteria criteria = session.createCriteria(Customer.class, "c");
+
+        if (!StringUtils.isNullOrEmpty(name)) {
+            criteria.add(Restrictions.eq("c.name", name));
+        }
+
+        if (!StringUtils.isNullOrEmpty(family)) {
+            criteria.add(Restrictions.eq("c.family", family));
+        }
+
+        if (!StringUtils.isNullOrEmpty(email)) {
+            criteria.add(Restrictions.eq("c.email", email));
+        }
+
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.property("c.name"), "name")
+                .add(Projections.property("c.family"), "family")
+                .add(Projections.property("c.email"), "email")
+                .add(Projections.property("c.balance"), "balance")
+                .add(Projections.property("c.state"), "state")
+        );
+
+        criteria.setResultTransformer(Transformers.aliasToBean(UserDto.class));
+        criteria.setFirstResult(firstResult);
+        criteria.setMaxResults(maxResult);
+
+        List<UserDto> list = criteria.list();
+        transaction.commit();
+        session.close();
+        return list;
+    }
+
 }
