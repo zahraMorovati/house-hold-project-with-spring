@@ -4,6 +4,8 @@ import lombok.*;
 import model.enums.HomeServiceTypes;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 @Builder(setterPrefix = "set")
 @Getter
@@ -23,6 +25,9 @@ public class HomeService {
     private double price;
     @Lob
     private String explanations; //توضیحات
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private List<Specialist> specialistList = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
