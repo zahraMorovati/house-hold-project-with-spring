@@ -1,5 +1,8 @@
 package model.enums;
 
 public enum OrderState {
-    //todo
+    WAITING_FOR_SPECIALIST_SUGGESTION,
+    WAITING_FOR_SPECIALIST_SELECTION,
+    WAITING_FOR_SPECIALIST_TO_COME,
+    STARTED,DONE,PAID
 }
