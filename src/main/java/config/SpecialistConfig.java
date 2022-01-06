@@ -1,7 +1,6 @@
 package config;
 
 import dao.SpecialistDaoImpl;
-import dao.interfaces.SpecialistDao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import service.SpecialistService;
