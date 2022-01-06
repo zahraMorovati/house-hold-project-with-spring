@@ -73,12 +73,11 @@ public class ManagerDaoImpl implements ManagerDao {
     }
 
     @Override
-    public List<Manager> getManagerByEmailAndPassword(String email, String password) {
+    public List<Manager> getManagerByEmail(String email) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query<Manager> query = session.createQuery("from Manager m where m.email=:email and m.password=:password");
+        Query<Manager> query = session.createQuery("from Manager m where m.email=:email");
         query.setParameter("email", email);
-        query.setParameter("password", password);
         List<Manager> results = query.getResultList();
         transaction.commit();
         session.close();
@@ -110,8 +109,8 @@ public class ManagerDaoImpl implements ManagerDao {
         );
 
         criteria.setResultTransformer(Transformers.aliasToBean(ManagerDto.class));
-        criteria.setFirstResult(firstResult);
-        criteria.setMaxResults(maxResult);
+        /*criteria.setFirstResult(firstResult);
+        criteria.setMaxResults(maxResult);*/
 
         List<ManagerDto> list = criteria.list();
         transaction.commit();

@@ -17,7 +17,7 @@ public interface ManagerDao {
 
     List<Manager> getManagerById(int id);
 
-    List<Manager> getManagerByEmailAndPassword(String email, String password);
+    List<Manager> getManagerByEmail(String email);
 
     List<ManagerDto> filter(String name, String family, String email, int maxResult, int firstResult);
 }

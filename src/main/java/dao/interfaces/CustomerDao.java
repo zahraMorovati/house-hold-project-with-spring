@@ -16,7 +16,7 @@ public interface CustomerDao {
 
     List<Customer> getCustomerById(int id);
 
-    List<Customer> getCustomerByEmailAndPassword(String email , String password);
+    List<Customer> getCustomerByEmail(String email);
 
     List<Customer> getAllCustomers();
 

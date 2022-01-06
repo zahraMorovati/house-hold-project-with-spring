@@ -3,7 +3,6 @@ package dao;
 import com.mysql.cj.util.StringUtils;
 import dao.interfaces.SpecialistDao;
 import dto.UserDto;
-import model.entity.Customer;
 import model.entity.Specialist;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -62,12 +61,11 @@ public class SpecialistDaoImpl implements SpecialistDao {
     }
 
     @Override
-    public List<Specialist> getSpecialistByEmailAndPassword(String email, String password) {
+    public List<Specialist> getSpecialistByEmail(String email) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query<Specialist> query = session.createQuery("from Specialist s where s.email=:email and s.password=:password");
+        Query<Specialist> query = session.createQuery("from Specialist s where s.email=:email");
         query.setParameter("email", email);
-        query.setParameter("password", password);
         List<Specialist> results = query.getResultList();
         transaction.commit();
         session.close();
@@ -112,8 +110,8 @@ public class SpecialistDaoImpl implements SpecialistDao {
         );
 
         criteria.setResultTransformer(Transformers.aliasToBean(UserDto.class));
-        criteria.setFirstResult(firstResult);
-        criteria.setMaxResults(maxResult);
+       /* criteria.setFirstResult(firstResult);
+        criteria.setMaxResults(maxResult);*/
 
         List<UserDto> list = criteria.list();
         transaction.commit();

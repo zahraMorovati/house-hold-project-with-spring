@@ -4,7 +4,6 @@ import com.mysql.cj.util.StringUtils;
 import dao.interfaces.CustomerDao;
 import dto.UserDto;
 import model.entity.Customer;
-import model.entity.Manager;
 import model.entity.Order;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -62,16 +61,16 @@ public class CustomerDaoImpl implements CustomerDao {
     }
 
     @Override
-    public List<Customer> getCustomerByEmailAndPassword(String email, String password) {
+    public List<Customer> getCustomerByEmail(String email) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        Query<Customer> query = session.createQuery("from Customer c where c.email=:email and c.password=:password");
+        Query<Customer> query = session.createQuery("from Customer c where c.email=:email");
         query.setParameter("email", email);
-        query.setParameter("password", password);
         List<Customer> results = query.getResultList();
         transaction.commit();
         session.close();
-        return results;    }
+        return results;
+    }
 
     @Override
     public List<Customer> getAllCustomers() {
@@ -122,8 +121,8 @@ public class CustomerDaoImpl implements CustomerDao {
         );
 
         criteria.setResultTransformer(Transformers.aliasToBean(UserDto.class));
-        criteria.setFirstResult(firstResult);
-        criteria.setMaxResults(maxResult);
+        /*criteria.setFirstResult(firstResult);
+        criteria.setMaxResults(maxResult);*/
 
         List<UserDto> list = criteria.list();
         transaction.commit();

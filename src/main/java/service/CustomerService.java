@@ -1,6 +1,7 @@
 package service;
 
 import dao.CustomerDaoImpl;
+import dto.UserDto;
 import model.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,11 +42,22 @@ public class CustomerService {
         else return customerList.get(0);
     }
 
-    public Customer findCustomerByEmailAndPassword(String email , String password){
-        List<Customer> customerList = customerDao.getCustomerByEmailAndPassword(email, password);
-        if(customerList.isEmpty())
-            throw new RuntimeException("wrong email or password!");
-        else return customerList.get(0);
+    public void changePassword(String email,String newPass){
+        List<Customer> result = customerDao.getCustomerByEmail(email);
+        if(!result.isEmpty()){
+            Customer customer = result.get(0);
+            customer.setPassword(newPass);
+            customerDao.update(customer);
+        }else throw new RuntimeException("wrong email!");
     }
+
+    public List<UserDto> filter (String name , String family ,String email){
+        //pagination is not handled that's why i put zero for max result
+        List<UserDto> list = customerDao.filter(name, family, email, 0, 0);
+        if(list.isEmpty())
+            throw new RuntimeException("cannot find any customer!");
+        return list;
+    }
+
 
 }
