@@ -41,10 +41,12 @@ public class ManagerService {
         else return managerList.get(0);
     }
 
-    public Manager findByEmailAndPassword(String email , String password){
-        List<Manager> managerList = managerDao.getManagerByEmailAndPassword(email, password);
-        if(managerList.isEmpty())
-            throw new RuntimeException("wrong email or password!");
-        else return managerList.get(0);
+    public void changePassword(String email,String newPass){
+        List<Manager> result = managerDao.getManagerByEmail(email);
+        if(!result.isEmpty()){
+            Manager manager = result.get(0);
+            manager.setPassword(newPass);
+            managerDao.update(manager);
+        }else throw new RuntimeException("wrong email!");
     }
 }
