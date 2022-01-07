@@ -3,6 +3,7 @@ package model.entity;
 import lombok.*;
 import model.enums.OrderState;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -23,7 +24,7 @@ public class Order {
     private HomeService service;
     private double suggestedPrice;
     private String explanations;
-    @Temporal(value = TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date registrationDate;
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date startDate;
