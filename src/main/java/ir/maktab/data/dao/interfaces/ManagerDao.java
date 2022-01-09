@@ -23,10 +23,11 @@ public interface ManagerDao extends PagingAndSortingRepository<Manager,Integer> 
     @Query(value = "update Manager m set m.password=:password  where m.email=:email")
     void updatePasswordByEmail( @Param("password") String password,@Param("email")String email);
 
-
     List<Manager> findManagerById(int id);
 
     List<Manager> findManagerByEmail(String email);
+
+    List<Manager> findManagerByNameOrFamilyOrEmail(String name,String family,String email);
 
 
 }
