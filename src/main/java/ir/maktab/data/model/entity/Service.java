@@ -1,11 +1,8 @@
 package ir.maktab.data.model.entity;
 
 import lombok.*;
-import model.enums.HomeServiceTypes;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 @Builder(setterPrefix = "set")
 @Getter
@@ -14,26 +11,19 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class HomeService {
+public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Enumerated(value = EnumType.STRING)
-    private HomeServiceTypes service;
-    @Column(unique = true,length = 25)
-    private String subService;
+    @Column(unique = true,length = 30)
+    private String serviceName;
     private double price;
-    @Lob
-    private String explanations; //توضیحات
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @ToString.Exclude
-    private List<Specialist> specialistList = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        HomeService service = (HomeService) o;
+        Service service = (Service) o;
         return id != 0 && Objects.equals(id, service.id);
     }
 
