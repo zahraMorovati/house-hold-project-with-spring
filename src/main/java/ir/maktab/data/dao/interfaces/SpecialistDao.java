@@ -9,19 +9,22 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+@Repository
+public interface SpecialistDao extends PagingAndSortingRepository<Specialist, Integer> {
 
-public interface SpecialistDao {
-    void save(Specialist specialist);
 
-    void delete(Specialist specialist);
 
-    void update(Specialist specialist);
+    List<Specialist> findSpecialistById(int id);
 
-    List<Specialist> getSpecialistById(int id);
+    List<Specialist> findSpecialistByEmail(String email);
 
-    List<Specialist> getSpecialistByEmail(String email);
+    @Transactional
+    @Modifying
+    @Query(value = "update Specialist s set s.name=:name,s.family=:family,s.email=:email,s.password=:password,s.balance=:balance where s.id=:id")
+    void update(@Param("name") String name, @Param("family") String family, @Param("email") String email, @Param("password") String password, @Param("balance") double balance, @Param("id") int id);
 
-    List<Specialist> getAllSpecialists();
-
-    List<UserDto> filter(String name, String family, String email, int maxResult, int firstResult);
+    @Transactional
+    @Modifying
+    @Query(value = "update Customer c set c.password=:newPassword where c.email=:email")
+    void updateCustomerPasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
 }
