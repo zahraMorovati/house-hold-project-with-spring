@@ -1,4 +1,4 @@
-package util;
+package ir.maktab.util;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
