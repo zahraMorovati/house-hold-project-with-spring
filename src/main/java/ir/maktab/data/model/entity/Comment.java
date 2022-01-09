@@ -1,11 +1,9 @@
-package model.entity;
+package ir.maktab.data.model.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.Objects;
 @Builder(setterPrefix = "set")
 @Getter
@@ -14,25 +12,19 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Suggestion {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @CreationTimestamp
-    private Date date;
-    private double suggestedPrice;
-    private double workHour;
-    @Temporal(value = TemporalType.TIME)
-    private Date startTime;
-    @OneToOne
-    private Specialist specialist;
+    private double point;
+    private String comment;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Suggestion that = (Suggestion) o;
-        return id != 0 && Objects.equals(id, that.id);
+        Comment comment = (Comment) o;
+        return id != 0 && Objects.equals(id, comment.id);
     }
 
     @Override

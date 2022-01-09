@@ -1,6 +1,6 @@
-package util;
+package ir.maktab.util;
 
-import model.entity.*;
+import ir.maktab.data.model.entity.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -39,7 +39,7 @@ public class HibernateUtil {
                 configuration.addAnnotatedClass(Customer.class);
                 configuration.addAnnotatedClass(Manager.class);
                 configuration.addAnnotatedClass(Order.class);
-                configuration.addAnnotatedClass(HomeService.class);
+                configuration.addAnnotatedClass(Service.class);
                 configuration.addAnnotatedClass(Specialist.class);
                 configuration.addAnnotatedClass(Suggestion.class);
 

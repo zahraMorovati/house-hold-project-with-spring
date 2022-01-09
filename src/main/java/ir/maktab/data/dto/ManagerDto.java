@@ -1,4 +1,4 @@
-package dto;
+package ir.maktab.data.dto;
 
 import lombok.Data;
 

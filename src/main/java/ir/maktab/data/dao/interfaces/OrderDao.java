@@ -1,7 +1,4 @@
-package dao.interfaces;
-
-import model.entity.Customer;
-import model.entity.Order;
+package ir.maktab.data.dao.interfaces;
 
 import java.util.List;
 

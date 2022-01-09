@@ -1,4 +1,4 @@
-package model.entity;
+package ir.maktab.data.model.entity;
 
 import lombok.*;
 import model.enums.HomeServiceTypes;

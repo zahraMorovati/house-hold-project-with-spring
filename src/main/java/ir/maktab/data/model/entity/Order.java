@@ -1,11 +1,12 @@
-package model.entity;
+package ir.maktab.data.model.entity;
 
 import lombok.*;
-import model.enums.OrderState;
+import ir.maktab.data.model.enums.OrderState;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 @Builder(setterPrefix = "set")
 @Getter
@@ -18,9 +19,9 @@ import java.util.Objects;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int orderId;
+    private int id;
     @OneToOne
-    private HomeService service;
+    private SubService subService;
     private double suggestedPrice;
     private String explanations;
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -31,8 +32,11 @@ public class Order {
     private Address address;
     @Enumerated(value = EnumType.STRING)
     private OrderState orderState;
+    @OneToMany
+    @ToString.Exclude
+    private List<Suggestion> suggestions;
     @OneToOne
-    private Suggestion suggestion;
+    private Specialist specialist;
     @ManyToOne(cascade = {CascadeType.ALL})
     private Customer customer;
     @OneToOne
@@ -44,7 +48,7 @@ public class Order {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Order order = (Order) o;
-        return orderId != 0 && Objects.equals(orderId, order.orderId);
+        return id != 0 && Objects.equals(id, order.id);
     }
 
     @Override

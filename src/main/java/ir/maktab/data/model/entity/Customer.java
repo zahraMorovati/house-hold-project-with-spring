@@ -1,8 +1,7 @@
-package model.entity;
+package ir.maktab.data.model.entity;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import model.enums.UserState;
+import ir.maktab.data.model.enums.UserState;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Entity;
