@@ -1,7 +1,7 @@
-package dto;
+package ir.maktab.data.dto;
 
 import lombok.Data;
-import model.enums.UserState;
+import ir.maktab.data.model.enums.UserState;
 @Data
 public class UserDto {
     private String name;
