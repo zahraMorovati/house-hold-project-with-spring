@@ -28,7 +28,7 @@ public interface CustomerDao extends PagingAndSortingRepository<Customer, Intege
     @Transactional
     @Modifying
     @Query(value = "update Customer c set c.password=:newPassword where c.email=:email")
-    void updateCustomerPasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
+    void updatePasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
 
-
+    List<Customer> findCustomerByNameOrFamilyOrEmail(String name,String family,String email);
 }
