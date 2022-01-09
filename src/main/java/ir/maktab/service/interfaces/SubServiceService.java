@@ -10,7 +10,7 @@ public interface SubServiceService {
 
     void update(SubService subService);
 
-    Iterable<SubService> findAll();
+    Iterable<SubService> findAll(int page , int size);
 
     SubService findById(int id);
 }

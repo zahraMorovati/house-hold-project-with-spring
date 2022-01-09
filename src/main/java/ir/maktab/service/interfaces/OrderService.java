@@ -11,7 +11,7 @@ public interface OrderService {
 
     void update(Order order);
 
-    Iterable<Order> findAll();
+    Iterable<Order> findAll(int page , int size);
 
     Order findById(int id);
 }

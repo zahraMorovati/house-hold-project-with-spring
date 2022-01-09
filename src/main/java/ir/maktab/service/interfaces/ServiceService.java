@@ -10,7 +10,7 @@ public interface ServiceService {
 
     void update(Service homeService);
 
-    Iterable<Service> findAll();
+    Iterable<Service> findAll(int page , int size);
 
     Service findById(int id);
 }
