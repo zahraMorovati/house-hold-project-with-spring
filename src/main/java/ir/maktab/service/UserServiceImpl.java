@@ -6,6 +6,7 @@ import ir.maktab.data.dao.interfaces.SpecialistDao;
 import ir.maktab.data.model.entity.Customer;
 import ir.maktab.data.model.entity.Manager;
 import ir.maktab.data.model.entity.Specialist;
+import ir.maktab.data.model.enums.UserState;
 import ir.maktab.data.model.enums.UserType;
 import ir.maktab.service.interfaces.UserService;
 
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
                         .setName(name)
                         .setFamily(family)
                         .setEmail(email)
+                        .setState(UserState.NEW_USER)
                         .setPassword(password).build();
                 specialistDao.save(specialist);
             }
@@ -31,6 +33,7 @@ public class UserServiceImpl implements UserService {
                 Customer customer = Customer.CustomerBuilder.aCustomer()
                         .setName(name)
                         .setFamily(family)
+                        .setState(UserState.NEW_USER)
                         .setEmail(email)
                         .setPassword(password).build();
                 customerDao.save(customer);
