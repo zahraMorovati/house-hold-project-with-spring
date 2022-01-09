@@ -26,5 +26,7 @@ public interface SpecialistDao extends PagingAndSortingRepository<Specialist, In
     @Transactional
     @Modifying
     @Query(value = "update Customer c set c.password=:newPassword where c.email=:email")
-    void updateCustomerPasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
+    void updatePasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
+
+    List<Specialist> findSpecialistByNameOrFamilyOrEmail(String name,String family,String email);
 }
