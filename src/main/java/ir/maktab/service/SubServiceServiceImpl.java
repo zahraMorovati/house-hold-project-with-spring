@@ -3,9 +3,13 @@ package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.SubServiceDao;
 import ir.maktab.data.model.entity.SubService;
+import ir.maktab.exception.subServiceExceptions.SubServiceNotFoundException;
 import ir.maktab.service.interfaces.SubServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class SubServiceServiceImpl implements SubServiceService {
@@ -33,13 +37,16 @@ public class SubServiceServiceImpl implements SubServiceService {
     }
 
     @Override
-    public Iterable<SubService> findAll() {
-        return subServiceDao.findAll();
+    public Iterable<SubService> findAll(int page , int size) {
+        return subServiceDao.findAll(PageRequest.of(page,size));
     }
 
     @Override
     public SubService findById(int id) {
-        return subServiceDao.findById(id).orElse(null);
+        Optional<SubService> optionalSubService = subServiceDao.findById(id);
+        if(optionalSubService.isPresent())
+            return optionalSubService.get();
+        else throw new SubServiceNotFoundException();
     }
 
     //todo use interface //service interface check service uniqe
