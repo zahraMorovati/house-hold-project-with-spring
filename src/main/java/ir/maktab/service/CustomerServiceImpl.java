@@ -2,11 +2,15 @@ package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.CustomerDao;
 import ir.maktab.data.model.entity.Customer;
+import ir.maktab.exception.UserEceptions.WrongEmailException;
+import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
 import ir.maktab.service.interfaces.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -29,8 +33,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Iterable<Customer> findAll() {
-        return null;
+    public Iterable<Customer> findAll(int page , int size) {
+        return customerDao.findAll(PageRequest.of(page,size));
     }
 
     @Override
@@ -38,24 +42,28 @@ public class CustomerServiceImpl implements CustomerService {
         customerDao.delete(customer);
     }
 
-    public Customer findCustomerById(int id){
-        List<Customer> customerList = customerDao.findCustomerById(id);
-        if(customerList.isEmpty())
-            throw new RuntimeException("cannot find customer by id!");
-        else return customerList.get(0);
-    }
-
     @Override
     public void changePassword(String email,String newPassword){
         List<Customer> result = customerDao.findCustomerByEmail(email);
         if(!result.isEmpty()){
-            customerDao.updateCustomerPasswordByEmail(newPassword,email);
-        }else throw new RuntimeException("wrong email!");
+            customerDao.updatePasswordByEmail(newPassword,email);
+        }else throw new WrongEmailException();
     }
 
     @Override
     public Customer findById(int id) {
-        return customerDao.findById(id).orElse(null);
+        Optional<Customer> optionalCustomer = customerDao.findById(id);
+        if(optionalCustomer.isPresent())
+            return optionalCustomer.get();
+        else throw new CustomerNotFoundException();
+    }
+
+    @Override
+    public List<Customer> filterByNameOrFamilyOrEmail(String name, String family, String email) {
+        List<Customer> customers = customerDao.findCustomerByNameOrFamilyOrEmail(name, family, email);
+        if(!customers.isEmpty())
+            return customers;
+        else throw new CustomerNotFoundException();
     }
 
 
