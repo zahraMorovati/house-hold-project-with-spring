@@ -17,7 +17,6 @@ public class Service {
     private int id;
     @Column(unique = true,length = 30)
     private String serviceName;
-    private double price;
 
     @Override
     public boolean equals(Object o) {
