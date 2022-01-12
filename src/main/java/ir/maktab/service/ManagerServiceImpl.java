@@ -3,6 +3,7 @@ package ir.maktab.service;
 import ir.maktab.data.dao.interfaces.ManagerDao;
 import ir.maktab.data.model.entity.Manager;
 import ir.maktab.exception.UserEceptions.WrongEmailException;
+import ir.maktab.exception.managerExceptions.CannotSaveManagerException;
 import ir.maktab.exception.managerExceptions.ManagerNotFoundException;
 import ir.maktab.service.interfaces.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public void save(Manager manager){
         managerDao.save(manager);
+        if(manager.getId()<0)
+            throw new CannotSaveManagerException();
     }
 
     @Override
