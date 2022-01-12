@@ -4,6 +4,7 @@ import lombok.*;
 import ir.maktab.data.model.enums.UserState;
 import org.hibernate.Hibernate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.Objects;
 @Entity
 public class Customer extends User {
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.MERGE)
     @ToString.Exclude
     private List<Order> orders = new ArrayList<>();
 
