@@ -1,8 +1,6 @@
 package ir.maktab.data.dao.interfaces;
 
-import ir.maktab.data.model.entity.Address;
 import ir.maktab.data.model.entity.Service;
-import ir.maktab.data.model.entity.SubService;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -15,8 +13,8 @@ public interface ServiceDao extends PagingAndSortingRepository<Service,Integer> 
 
     @Transactional
     @Modifying
-    @Query(value = "update Service s set s.serviceName=:serviceName , s.price=:price where s.id=:id")
-    void update(@Param("serviceName") String serviceName, @Param("price") double price, @Param("id") int id);
+    @Query(value = "update Service s set s.serviceName=:serviceName where s.id=:id")
+    void update(@Param("serviceName") String serviceName, @Param("id") int id);
 
 
 }
