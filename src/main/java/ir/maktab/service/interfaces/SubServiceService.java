@@ -1,5 +1,6 @@
 package ir.maktab.service.interfaces;
 
+import ir.maktab.data.model.entity.Specialist;
 import ir.maktab.data.model.entity.SubService;
 
 public interface SubServiceService {
@@ -13,4 +14,9 @@ public interface SubServiceService {
     Iterable<SubService> findAll(int page , int size);
 
     SubService findById(int id);
+
+    void addSpecialistToSubService(SubService subservice , Specialist specialist);
+
+    void removeSpecialistFromSubService(SubService subservice , Specialist specialist);
+
 }
