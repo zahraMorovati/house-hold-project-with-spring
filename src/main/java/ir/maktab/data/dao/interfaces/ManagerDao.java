@@ -1,6 +1,5 @@
 package ir.maktab.data.dao.interfaces;
 
-import ir.maktab.data.dto.ManagerDto;
 import ir.maktab.data.model.entity.Manager;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,8 +21,6 @@ public interface ManagerDao extends PagingAndSortingRepository<Manager,Integer> 
     @Modifying
     @Query(value = "update Manager m set m.password=:password  where m.email=:email")
     void updatePasswordByEmail( @Param("password") String password,@Param("email")String email);
-
-    List<Manager> findManagerById(int id);
 
     List<Manager> findManagerByEmail(String email);
 
