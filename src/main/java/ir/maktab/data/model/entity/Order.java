@@ -4,6 +4,8 @@ import lombok.*;
 import ir.maktab.data.model.enums.OrderState;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -29,19 +31,19 @@ public class Order {
     private Date registrationDate;
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date startDate;
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST})
     private Address address;
     @Enumerated(value = EnumType.STRING)
     private OrderState orderState;
-    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToMany(cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Suggestion> suggestions;
     @OneToOne
     private Specialist specialist;
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne(cascade = {CascadeType.MERGE})
     private Customer customer;
-    @OneToOne
-    private Comment comment;
+
 
 
     @Override
