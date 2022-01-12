@@ -1,9 +1,13 @@
 package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.CustomerDao;
+import ir.maktab.data.dao.interfaces.OrderDao;
 import ir.maktab.data.model.entity.Customer;
+import ir.maktab.data.model.entity.Order;
 import ir.maktab.exception.UserEceptions.WrongEmailException;
+import ir.maktab.exception.customerExceptions.CannotSaveCustomerException;
 import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
+import ir.maktab.exception.orderExceptions.CannotSaveOrderException;
 import ir.maktab.service.interfaces.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +29,8 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void save(Customer customer){
         customerDao.save(customer);
+        if(customer.getId()<0)
+            throw new CannotSaveCustomerException();
     }
 
     @Override
