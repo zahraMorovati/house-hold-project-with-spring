@@ -2,6 +2,7 @@ package ir.maktab.service.interfaces;
 
 import ir.maktab.data.model.entity.Specialist;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface SpecialistService {
@@ -19,4 +20,6 @@ public interface SpecialistService {
     Specialist findById(int id);
 
     List<Specialist> filterByNameOrFamilyOrEmail(String name, String family, String email);
+
+    void changeSpecialistImage(Specialist specialist , String urlImage) throws IOException;
 }

@@ -13,9 +13,6 @@ import java.util.List;
 public interface SpecialistDao extends PagingAndSortingRepository<Specialist, Integer> {
 
 
-
-    List<Specialist> findSpecialistById(int id);
-
     List<Specialist> findSpecialistByEmail(String email);
 
     @Transactional
@@ -25,8 +22,13 @@ public interface SpecialistDao extends PagingAndSortingRepository<Specialist, In
 
     @Transactional
     @Modifying
-    @Query(value = "update Customer c set c.password=:newPassword where c.email=:email")
+    @Query(value = "update Specialist s set s.password=:newPassword where s.email=:email")
     void updatePasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
 
     List<Specialist> findSpecialistByNameOrFamilyOrEmail(String name,String family,String email);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update Specialist s set s.image=:image where s.id=:id")
+    void updateSpecialistImage(@Param("image") byte[] image, @Param("id") int id);
 }

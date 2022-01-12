@@ -2,12 +2,14 @@ package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.SpecialistDao;
 import ir.maktab.data.model.entity.Specialist;
+import ir.maktab.exception.specialistExceptions.CannotSaveSpecialistException;
 import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.interfaces.SpecialistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,8 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Override
     public void save(Specialist specialist){
         specialistDao.save(specialist);
+        if(specialist.getId()<0)
+            throw new CannotSaveSpecialistException();
     }
 
     @Override
@@ -64,6 +68,22 @@ public class SpecialistServiceImpl implements SpecialistService {
             return specialists;
         else throw new SpecialistNotFoundException();
 
+    }
+
+    @Override
+    public void changeSpecialistImage(Specialist specialist, String urlImage) throws IOException {
+
+        //save image into database
+        File file = new File(urlImage);
+        int imageSize = (int) file.length();
+        byte[] bFile = new byte[(int) file.length()];
+
+        FileInputStream fileInputStream = new FileInputStream(file);
+        //convert file into array of bytes
+        fileInputStream.read(bFile);
+        fileInputStream.close();
+
+        specialistDao.updateSpecialistImage(bFile,specialist.getId());
     }
 
 
