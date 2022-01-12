@@ -1,11 +1,16 @@
 package ir.maktab.data.model.entity;
 
-import lombok.*;
 import ir.maktab.data.model.enums.UserState;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.util.Date;
-@EqualsAndHashCode
+import java.util.Objects;
+
 @Getter
 @Setter
 @ToString
@@ -28,4 +33,16 @@ public class User {
     private Date RegistrationDate;
     private double balance;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return id != 0 && Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
