@@ -14,8 +14,9 @@ import java.util.Objects;
 @Entity
 public class Specialist extends User {
     @Lob
-    @Column(length = 300_000,columnDefinition = "BLOB")
+    @Column(length = 300_000,columnDefinition = "BLOB") //large amount of byte data
     private byte[] image;
+    private double point;
 
     @Override
     public boolean equals(Object o) {
