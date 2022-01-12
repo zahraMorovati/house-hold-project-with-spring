@@ -8,6 +8,9 @@ import ir.maktab.data.model.entity.Manager;
 import ir.maktab.data.model.entity.Specialist;
 import ir.maktab.data.model.enums.UserState;
 import ir.maktab.data.model.enums.UserType;
+import ir.maktab.exception.customerExceptions.CannotSaveCustomerException;
+import ir.maktab.exception.managerExceptions.CannotSaveManagerException;
+import ir.maktab.exception.specialistExceptions.CannotSaveSpecialistException;
 import ir.maktab.service.interfaces.UserService;
 
 public class UserServiceImpl implements UserService {
@@ -27,6 +30,8 @@ public class UserServiceImpl implements UserService {
                         .setState(UserState.NEW_USER)
                         .setPassword(password).build();
                 specialistDao.save(specialist);
+                if (specialist.getId() < 0)
+                    throw new CannotSaveSpecialistException();
             }
             break;
             case CUSTOMER: {
@@ -37,6 +42,8 @@ public class UserServiceImpl implements UserService {
                         .setEmail(email)
                         .setPassword(password).build();
                 customerDao.save(customer);
+                if (customer.getId() < 0)
+                    throw new CannotSaveCustomerException();
             }
             break;
             case MANAGER: {
@@ -46,6 +53,8 @@ public class UserServiceImpl implements UserService {
                         .setEmail(email)
                         .setPassword(password).build();
                 managerDao.save(manager);
+                if (manager.getId() < 0)
+                    throw new CannotSaveManagerException();
             }
             break;
         }
