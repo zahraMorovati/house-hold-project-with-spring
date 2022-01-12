@@ -2,6 +2,7 @@ package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.ServiceDao;
 import ir.maktab.data.model.entity.Service;
+import ir.maktab.exception.serviceExceptions.CannotSaveServiceException;
 import ir.maktab.exception.serviceExceptions.ServiceNotFoundException;
 import ir.maktab.service.interfaces.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,15 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public void save(Service homeService){
-        serviceDao.save(homeService);
+    public void save(Service service){
+        serviceDao.save(service);
+        if(service.getId()<0)
+            throw new CannotSaveServiceException();
     }
 
     @Override
     public void update(Service service){
-        serviceDao.update(service.getServiceName(),service.getPrice(),service.getId());
+        serviceDao.update(service.getServiceName(),service.getId());
     }
 
     @Override
@@ -43,8 +46,8 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public void delete(Service homeService){
-        serviceDao.delete(homeService);
+    public void delete(Service service){
+        serviceDao.delete(service);
     }
 
 
