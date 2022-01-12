@@ -4,7 +4,6 @@ package ir.maktab.exception.subServiceExceptions;
  */
 public class SubServiceNotFoundException extends RuntimeException{
 
-
     /**
      * Constructs a {@code SubServiceNotFoundException} with no detail message.
      */
