@@ -14,11 +14,7 @@ import java.util.List;
 public interface CustomerDao extends PagingAndSortingRepository<Customer, Integer> {
 
 
-    List<Customer> findCustomerById(int id);
-
     List<Customer> findCustomerByEmail(String email);
-
-    List<Customer> findCustomerByEmailAndPassword(String email , String password);
 
     @Transactional
     @Modifying

@@ -1,6 +1,7 @@
 package ir.maktab.service.interfaces;
 
 import ir.maktab.data.model.entity.Customer;
+import ir.maktab.data.model.entity.Order;
 
 import java.util.List;
 
@@ -19,6 +20,5 @@ public interface CustomerService {
     Customer findById(int id);
 
     List<Customer> filterByNameOrFamilyOrEmail(String name,String family,String email);
-
 
 }
