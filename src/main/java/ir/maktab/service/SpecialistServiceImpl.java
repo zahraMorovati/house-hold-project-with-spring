@@ -2,6 +2,7 @@ package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.SpecialistDao;
 import ir.maktab.data.model.entity.Specialist;
+import ir.maktab.exception.UserEceptions.WrongEmailException;
 import ir.maktab.exception.specialistExceptions.CannotSaveSpecialistException;
 import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.interfaces.SpecialistService;
@@ -50,7 +51,7 @@ public class SpecialistServiceImpl implements SpecialistService {
         List<Specialist> result = specialistDao.findSpecialistByEmail(email);
         if(!result.isEmpty()){
             specialistDao.updatePasswordByEmail(email,newPass);
-        }else throw new RuntimeException("wrong email!");
+        }else throw new WrongEmailException();
     }
 
     @Override
