@@ -1,8 +1,8 @@
 package ir.maktab.data.dao.interfaces;
 
-import ir.maktab.data.model.entity.Address;
-import ir.maktab.data.model.entity.Order;
-import ir.maktab.data.model.entity.SubService;
+import ir.maktab.data.entity.Address;
+import ir.maktab.data.entity.Order;
+import ir.maktab.data.entity.SubService;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface OrderDao extends PagingAndSortingRepository<Order, Integer> {
@@ -29,4 +30,11 @@ public interface OrderDao extends PagingAndSortingRepository<Order, Integer> {
                 @Param("startDate") Date startDate,
                 @Param("address") Address address,
                 @Param("id") int id);
+
+    List<Order> findOrderByOrderCode(String orderCode);
+
+    List<Order> findOrderByCustomer_Email(String email);
+
+    List<Order> findOrderBySpecialist_Email(String email);
+
 }

@@ -1,6 +1,7 @@
 package ir.maktab.service.interfaces;
 
-import ir.maktab.data.model.entity.*;
+import ir.maktab.data.dto.OrderDto;
+import ir.maktab.data.entity.*;
 
 import java.util.Date;
 import java.util.List;
@@ -18,12 +19,16 @@ public interface OrderService {
 
     Order findById(int id);
 
-    void addCustomerOrder(Customer customer, SubService subService, double suggestedPrice, String explanations, Address address, Date startDate);
+    Order findByOrderCode(String orderCode);
 
-    void addSpecialistSuggestion(Order order ,Specialist specialist, double suggestedPrice , double workHour , Date startTime );
+    void addCustomerOrder(Customer customer, SubService subService, double suggestedPrice, String explanations, Address address, Date startDate);
 
     void selectSpecialistSuggestion(Order order , Suggestion suggestion);
 
     List<Suggestion> getOrderSuggestions(Order order);
+
+    List<OrderDto> getCustomerOrders(String email);
+
+    List<OrderDto> getSpecialistOrders(String email);
 
 }

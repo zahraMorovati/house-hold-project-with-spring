@@ -1,7 +1,7 @@
 package ir.maktab.service;
 
 import ir.maktab.config.SpringConfig;
-import ir.maktab.data.model.entity.*;
+import ir.maktab.data.entity.*;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -34,7 +34,7 @@ public class OrderServiceTests {
 
         Order order = orderService.findById(1);
         Specialist specialist = specialistService.findById(1);
-        orderService.addSpecialistSuggestion(order,specialist,100,2,new Date());
+        suggestionService.addSpecialistSuggestion(order,specialist,200,3,new Date());
     }
 
     @Test
