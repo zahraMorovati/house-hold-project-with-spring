@@ -1,17 +1,21 @@
 package ir.maktab.service;
 
 import ir.maktab.config.SpringConfig;
-import ir.maktab.data.model.entity.Customer;
+import ir.maktab.data.entity.Customer;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-@DataJpaTest
 public class CustomerServiceTests {
 
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
-    CustomerServiceImpl customerService = (CustomerServiceImpl) context.getBean(CustomerServiceImpl.class);
+    CustomerServiceImpl customerService ;
+
+    @Autowired
+    public CustomerServiceTests(CustomerServiceImpl customerService) {
+        this.customerService = customerService;
+    }
     private Customer customer;
 
     @Test
