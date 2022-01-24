@@ -16,13 +16,13 @@ import ir.maktab.exception.suggestionExceptions.EmptySuggestionList;
 import ir.maktab.exception.suggestionExceptions.SuggestionNotFoundException;
 import ir.maktab.service.interfaces.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import java.util.Comparator;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order findByOrderCode(String orderCode) {
         List<Order> result = orderDao.findOrderByOrderCode(orderCode);
-        if(result.isEmpty())
+        if (result.isEmpty())
             throw new OrderNotFoundException();
         else return result.get(0);
     }
@@ -86,22 +86,20 @@ public class OrderServiceImpl implements OrderService {
                 customer = optionalCustomer.get();
                 subService = optionalSubService.get();
 
-                //todo private orderBuilder - sperate parts - private methods
-                Order order = getOrder(customer, subService, suggestedPrice, explanations, address, startDate);
+                String code = getRandomCode(orderDao);
+                Order order = getOrder(customer, subService, suggestedPrice, explanations, address, startDate, code);
                 orderDao.save(order);
-
-                if (order.getId() < 0)
-                    throw new CannotSaveOrderException();
-
-            } else throw new SubServiceNotFoundException();
+            }else throw new SubServiceNotFoundException();
 
         } else throw new CustomerNotFoundException();
 
-
     }
 
-    private Order getOrder(Customer customer, SubService subService, double suggestedPrice, String explanations, Address address, Date startDate) {
+
+
+    private Order getOrder(Customer customer, SubService subService, double suggestedPrice, String explanations, Address address, Date startDate, String orderCode) {
         Order order = Order.builder()
+                .setOrderCode(orderCode)
                 .setSubService(subService)
                 .setCustomer(customer)
                 .setSuggestedPrice(suggestedPrice)
@@ -163,6 +161,15 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDto> getSpecialistOrders(String email) {
         List<Order> orderList = orderDao.findOrderBySpecialist_Email(email);
         return orderList.stream().map(OrderMapper::toOrderDto).collect(Collectors.toList());
+    }
+
+    private String getRandomCode(OrderDao orderDao) {
+        Random random = new Random();
+        String code = random.ints(6).toString();
+        int result = orderDao.findOrderByOrderCode(code).size();
+        if (result <= 0) {
+            return code;
+        } else return getRandomCode(orderDao);
     }
 
 
