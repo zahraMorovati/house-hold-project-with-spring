@@ -1,10 +1,13 @@
 package ir.maktab.service.interfaces;
 
-import ir.maktab.data.model.entity.Service;
+import ir.maktab.data.dto.ServiceDto;
+import ir.maktab.data.entity.Service;
+
+import java.util.List;
 
 public interface ServiceService {
 
-    void save(Service service);
+    void save(ServiceDto serviceDto);
 
     void delete(Service service);
 
@@ -13,4 +16,8 @@ public interface ServiceService {
     Iterable<Service> findAll(int page , int size);
 
     Service findById(int id);
+
+    Service findByName(String name);
+
+    List<ServiceDto> getServiceNames();
 }
