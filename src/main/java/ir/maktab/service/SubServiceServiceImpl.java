@@ -3,12 +3,14 @@ package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.SpecialistDao;
 import ir.maktab.data.dao.interfaces.SubServiceDao;
-import ir.maktab.data.model.entity.Specialist;
-import ir.maktab.data.model.entity.SubService;
-import ir.maktab.exception.specialistExceptions.CannotSaveSpecialistException;
+import ir.maktab.data.dto.SubServiceDto;
+import ir.maktab.data.dto.mappers.SubServiceMapper;
+import ir.maktab.data.dto.mappers.UserMapper;
+import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.entity.SubService;
 import ir.maktab.exception.specialistExceptions.DuplicatedSpecialist;
 import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
-import ir.maktab.exception.subServiceExceptions.CannotSaveSubServiceException;
+import ir.maktab.exception.subServiceExceptions.DuplicatedSubServiceException;
 import ir.maktab.exception.subServiceExceptions.SubServiceNotFoundException;
 import ir.maktab.service.interfaces.SubServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class SubServiceServiceImpl implements SubServiceService {
@@ -31,10 +35,12 @@ public class SubServiceServiceImpl implements SubServiceService {
     }
 
     @Override
-    public void save(SubService subService) {
-        subServiceDao.save(subService);
-        if(subService.getId()<0)
-            throw new CannotSaveSubServiceException();
+    public void save(SubServiceDto subServiceDto) {
+        int result = subServiceDao.findSubServiceBySubServiceName(subServiceDto.getSubServiceName()).size();
+        if (result <= 0) {
+            SubService subService = SubServiceMapper.toSubService(subServiceDto);
+            subServiceDao.save(subService);
+        } else throw new DuplicatedSubServiceException();
     }
 
     @Override
@@ -44,20 +50,28 @@ public class SubServiceServiceImpl implements SubServiceService {
 
     @Override
     public void update(SubService subService) {
-        subServiceDao.update(subService.getService(),subService.getSubServiceName(),subService.getExplanations(),subService.getId());
+        subServiceDao.update(subService.getService(), subService.getSubServiceName(), subService.getExplanations(), subService.getId());
     }
 
     @Override
-    public Iterable<SubService> findAll(int page , int size) {
-        return subServiceDao.findAll(PageRequest.of(page,size));
+    public Iterable<SubService> findAll(int page, int size) {
+        return subServiceDao.findAll(PageRequest.of(page, size));
     }
 
     @Override
     public SubService findById(int id) {
         Optional<SubService> optionalSubService = subServiceDao.findById(id);
-        if(optionalSubService.isPresent())
+        if (optionalSubService.isPresent())
             return optionalSubService.get();
         else throw new SubServiceNotFoundException();
+    }
+
+    @Override
+    public SubService findByName(String name) {
+        List<SubService> result = subServiceDao.findSubServiceBySubServiceName(name);
+        if (result.isEmpty())
+            throw new SubServiceNotFoundException();
+        else return result.get(0);
     }
 
     @Override
@@ -65,26 +79,26 @@ public class SubServiceServiceImpl implements SubServiceService {
 
         //check subService existence
         subservice = subServiceDao.findById(subservice.getId()).orElse(null);
-        if(subservice!=null){
+        if (subservice != null) {
 
             //check specialist existence
             specialist = specialistDao.findSpecialistByEmail(specialist.getEmail()).get(0);
-            if(specialist!=null){
+            if (specialist != null) {
                 int id = specialist.getId();
 
                 //check specialist is not duplicated
                 Optional<Specialist> duplicatedSpecialist = subservice.getSpecialists().stream().filter(i -> i.getId() == id).findAny();
-                if(duplicatedSpecialist.isPresent()){
+                if (duplicatedSpecialist.isPresent()) {
                     throw new DuplicatedSpecialist("this specialist already exist in this subService!");
-                }else {
+                } else {
                     List<Specialist> specialistList = subservice.getSpecialists();
                     specialistList.add(specialist);
                     subServiceDao.save(subservice);
                 }
-            }else {
+            } else {
                 throw new SpecialistNotFoundException();
             }
-        }else {
+        } else {
             throw new SubServiceNotFoundException();
         }
 
@@ -96,30 +110,39 @@ public class SubServiceServiceImpl implements SubServiceService {
 
         //check subService existence
         subservice = subServiceDao.findById(subservice.getId()).orElse(null);
-        if(subservice!=null){
+        if (subservice != null) {
 
             //check specialist existence
             specialist = specialistDao.findSpecialistByEmail(specialist.getEmail()).get(0);
-            if(specialist!=null){
+            if (specialist != null) {
                 int id = specialist.getId();
 
                 //check specialist is existing in subService list
                 Optional<Specialist> duplicatedSpecialist = subservice.getSpecialists().stream().filter(i -> i.getId() == id).findAny();
-                if(duplicatedSpecialist.isPresent()){
+                if (duplicatedSpecialist.isPresent()) {
                     List<Specialist> specialistList = subservice.getSpecialists();
                     specialistList.remove(specialist);
                     subServiceDao.save(subservice);
 
-                }else {
+                } else {
                     throw new SpecialistNotFoundException("there is no specialist in this subService!");
                 }
-            }else {
+            } else {
                 throw new SpecialistNotFoundException();
             }
-        }else {
+        } else {
             throw new SubServiceNotFoundException();
         }
 
+    }
+
+    @Override
+    public List<SubServiceDto> getAllSubServices() {
+        List<SubService> subServices = StreamSupport
+                .stream(subServiceDao.findAll().spliterator(),false)
+                .collect(Collectors.toList());
+        return subServices.stream()
+                .map(SubServiceMapper::toSubServiceDto).collect(Collectors.toList());
     }
 
 

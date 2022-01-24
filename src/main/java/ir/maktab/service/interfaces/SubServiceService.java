@@ -1,11 +1,14 @@
 package ir.maktab.service.interfaces;
 
-import ir.maktab.data.model.entity.Specialist;
-import ir.maktab.data.model.entity.SubService;
+import ir.maktab.data.dto.SubServiceDto;
+import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.entity.SubService;
+
+import java.util.List;
 
 public interface SubServiceService {
 
-    void save(SubService subService);
+    void save(SubServiceDto subServiceDto);
 
     void delete(SubService subService);
 
@@ -15,8 +18,12 @@ public interface SubServiceService {
 
     SubService findById(int id);
 
+    SubService findByName(String name);
+
     void addSpecialistToSubService(SubService subservice , Specialist specialist);
 
     void removeSpecialistFromSubService(SubService subservice , Specialist specialist);
+
+    List<SubServiceDto> getAllSubServices();
 
 }
