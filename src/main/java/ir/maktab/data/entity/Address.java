@@ -1,4 +1,4 @@
-package ir.maktab.data.model.entity;
+package ir.maktab.data.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
