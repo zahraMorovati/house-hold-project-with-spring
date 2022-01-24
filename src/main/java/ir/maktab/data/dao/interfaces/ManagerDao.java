@@ -1,6 +1,6 @@
 package ir.maktab.data.dao.interfaces;
 
-import ir.maktab.data.model.entity.Manager;
+import ir.maktab.data.entity.Manager;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -24,7 +24,10 @@ public interface ManagerDao extends PagingAndSortingRepository<Manager,Integer> 
 
     List<Manager> findManagerByEmail(String email);
 
+    //todo return pagable
     List<Manager> findManagerByNameOrFamilyOrEmail(String name,String family,String email);
+
+    List<Manager> findManagerByEmailAndPassword(String email, String password);
 
 
 }

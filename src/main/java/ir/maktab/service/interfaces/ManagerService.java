@@ -1,6 +1,7 @@
 package ir.maktab.service.interfaces;
 
-import ir.maktab.data.model.entity.Manager;
+import ir.maktab.data.entity.Customer;
+import ir.maktab.data.entity.Manager;
 
 import java.util.List;
 
@@ -17,5 +18,7 @@ public interface ManagerService {
 
     Manager findById(int id);
 
-    List<Manager> filterByNameOrFamilyOrEmail(String name, String family, String email);
+    List<Manager> filterByNameOrFamilyOrEmail(String name, String family, String email); //todo
+
+    Manager findByEmailAndPassword(String email, String password);
 }

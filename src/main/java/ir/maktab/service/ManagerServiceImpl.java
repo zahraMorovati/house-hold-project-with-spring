@@ -1,11 +1,14 @@
 package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.ManagerDao;
-import ir.maktab.data.model.entity.Manager;
+import ir.maktab.data.entity.Customer;
+import ir.maktab.data.entity.Manager;
 import ir.maktab.exception.UserEceptions.WrongEmailException;
+import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
 import ir.maktab.exception.managerExceptions.CannotSaveManagerException;
 import ir.maktab.exception.managerExceptions.ManagerNotFoundException;
 import ir.maktab.service.interfaces.ManagerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -16,7 +19,7 @@ import java.util.Optional;
 @Service
 public class ManagerServiceImpl implements ManagerService {
 
-    protected ManagerDao managerDao;
+    ManagerDao managerDao;
 
     @Autowired
     public ManagerServiceImpl(ManagerDao managerDao) {
@@ -69,6 +72,14 @@ public class ManagerServiceImpl implements ManagerService {
         if(!managers.isEmpty())
             return managers;
         else throw new ManagerNotFoundException();
+    }
+
+    @Override
+    public Manager findByEmailAndPassword(String email, String password) {
+        List<Manager> result = managerDao.findManagerByEmailAndPassword(email,password);
+        if (result.size() >= 1) {
+            return result.get(0);
+        } else throw new ManagerNotFoundException();
     }
 
 
