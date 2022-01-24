@@ -1,10 +1,18 @@
-package ir.maktab.data.model.entity;
+package ir.maktab.data.entity;
 
-import lombok.*;
-import ir.maktab.data.model.enums.UserState;
+import ir.maktab.data.enums.UserState;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -13,10 +21,17 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 public class Specialist extends User {
+
     @Lob
-    @Column(length = 300_000,columnDefinition = "BLOB") //large amount of byte data
+    @Column(length = 300_000,columnDefinition = "BLOB")
     private byte[] image;
-    private double point;
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "specialist",cascade = CascadeType.MERGE)
+    @ToString.Exclude
+    private List<Order> orders = new ArrayList<>();
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -45,6 +60,11 @@ public class Specialist extends User {
 
         public SpecialistBuilder setImage(byte[] image) {
             specialist.setImage(image);
+            return this;
+        }
+
+        public SpecialistBuilder setOrders(List<Order> orders) {
+            specialist.setOrders(orders);
             return this;
         }
 
@@ -89,7 +109,7 @@ public class Specialist extends User {
         }
 
         public SpecialistBuilder but() {
-            return aSpecialist().setImage(specialist.getImage()).setId(specialist.getId()).setName(specialist.getName()).setFamily(specialist.getFamily()).setEmail(specialist.getEmail()).setPassword(specialist.getPassword()).setState(specialist.getState()).setRegistrationDate(specialist.getRegistrationDate()).setBalance(specialist.getBalance());
+            return aSpecialist().setImage(specialist.getImage()).setOrders(specialist.getOrders()).setId(specialist.getId()).setName(specialist.getName()).setFamily(specialist.getFamily()).setEmail(specialist.getEmail()).setPassword(specialist.getPassword()).setState(specialist.getState()).setRegistrationDate(specialist.getRegistrationDate()).setBalance(specialist.getBalance());
         }
 
         public Specialist build() {
