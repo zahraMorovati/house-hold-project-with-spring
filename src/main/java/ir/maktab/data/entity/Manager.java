@@ -1,4 +1,4 @@
-package ir.maktab.data.model.entity;
+package ir.maktab.data.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -16,10 +16,14 @@ public class Manager {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
+
     private String family;
+
     @Column(unique = true, nullable = false,length = 30)
     private String email;
+
     @Column(nullable = false, length = 8)
     private String password;
 
