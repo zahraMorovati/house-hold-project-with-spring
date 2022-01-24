@@ -1,8 +1,9 @@
 package ir.maktab.service.interfaces;
 
-import ir.maktab.data.model.enums.UserType;
+import ir.maktab.data.dto.UserDto;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 public interface UserService {
 
-    void saveUserByType(UserType userType, String name , String family , String email , String password);
+    void saveUserByType(UserDto userDto, CommonsMultipartFile image);
 }
