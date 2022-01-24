@@ -1,8 +1,10 @@
-package ir.maktab.data.model.entity;
+package ir.maktab.data.entity;
 
 import lombok.*;
-import ir.maktab.data.model.enums.UserState;
+import ir.maktab.data.enums.UserState;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,6 +21,7 @@ import java.util.Objects;
 @Entity
 public class Customer extends User {
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "customer",cascade = CascadeType.MERGE)
     @ToString.Exclude
     private List<Order> orders = new ArrayList<>();
