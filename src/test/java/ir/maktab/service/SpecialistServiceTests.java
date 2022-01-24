@@ -1,8 +1,8 @@
 package ir.maktab.service;
 
 import ir.maktab.config.SpringConfig;
-import ir.maktab.data.model.entity.Specialist;
-import ir.maktab.data.model.enums.UserState;
+import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.enums.UserState;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -32,11 +32,6 @@ public class SpecialistServiceTests {
     @Test
     public void change_specialist_image_throw_IOException(){
         Specialist specialist = specialistService.findById(1);
-        try {
-            specialistService.changeSpecialistImage(specialist,"E:\\images/1.jpg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 }

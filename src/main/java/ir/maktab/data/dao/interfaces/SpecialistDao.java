@@ -1,6 +1,6 @@
 package ir.maktab.data.dao.interfaces;
 
-import ir.maktab.data.model.entity.Specialist;
+import ir.maktab.data.entity.Specialist;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 @Repository
 public interface SpecialistDao extends PagingAndSortingRepository<Specialist, Integer> {
 
@@ -25,10 +26,12 @@ public interface SpecialistDao extends PagingAndSortingRepository<Specialist, In
     @Query(value = "update Specialist s set s.password=:newPassword where s.email=:email")
     void updatePasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
 
-    List<Specialist> findSpecialistByNameOrFamilyOrEmail(String name,String family,String email);
+    List<Specialist> findSpecialistByNameOrFamilyOrEmail(String name, String family, String email);
 
     @Transactional
     @Modifying
-    @Query(value = "update Specialist s set s.image=:image where s.id=:id")
-    void updateSpecialistImage(@Param("image") byte[] image, @Param("id") int id);
+    @Query(value = "update Specialist s set s.image=:image where s.email=:email")
+    void updateSpecialistImage(@Param("image") byte[] image, @Param("email") String email); //todo update and find by email
+
+    List<Specialist> findSpecialistByEmailAndPassword(String email, String password);
 }
