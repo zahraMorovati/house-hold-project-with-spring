@@ -1,4 +1,4 @@
-package ir.maktab.data.model.enums;
+package ir.maktab.data.enums;
 
 public enum HomeServiceTypes {
 
