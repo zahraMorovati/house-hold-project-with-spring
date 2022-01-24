@@ -5,65 +5,93 @@
 <html>
 <head>
     <title>sign up</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+            integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn"
+            crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
 
-<form:form cssClass="p-1 my-5 mx-5"  modelAttribute="userDto"
-           action="/user/signup" method="post" enctype="multipart/form-data">
-    <table class="table table-bordered table-striped text-dark">
-        <tr>
-            <td>name:</td>
-            <td><form:input path="name" /></td>
-        </tr>
 
-        <tr>
-            <td>family:</td>
-            <td><form:input path="family" /></td>
-        </tr>
+<div class="container">
 
-        <tr>
-            <td>email:</td>
-            <td><form:input path="email" /></td>
-        </tr>
+    <div class="center">
+        <div style="background-color: white; height: 650px; width: 500px; border-radius: 5%;" >
+            <div class=" p-5 justify-content-center m-4">
+                <h4 class="text-center" style="margin-bottom: 30px; font-size: 30px" >Sign up</h4>
+                <form:form modelAttribute="userDto" action="/user/signup" method="post" enctype="multipart/form-data">
+                    <table border="0" cellpadding="5">
+                        <tr>
+                            <td>name:</td>
+                            <td>
+                                <form:input path="name" cssClass=" form-control space" id="name" title="name:"/>
+                            </td>
+                        </tr>
 
-        <tr>
-            <td>password:</td>
-            <td><form:input path="password" /></td>
-        </tr>
+                        <tr>
+                            <td>family:</td>
+                            <td><form:input path="family" cssClass=" form-control space"/></td>
+                        </tr>
 
-        <tr>
-            <td>
-                user type:
-            </td>
-            <td>
-                <form:select path="userType" id="userType" onchange="updateDropDownList()">
-                    <form:option value="CUSTOMER" label="customer"/>
-                    <form:option value="SPECIALIST" label="specialist"/>
-                </form:select>
-            </td>
+                        <tr>
+                            <td>email:</td>
+                            <td><form:input path="email" cssClass="form-control space" /></td>
+                        </tr>
 
-        </tr>
+                        <tr>
+                            <td>password:</td>
+                            <td><form:input path="password" cssClass=" form-control space"/></td>
+                        </tr>
 
-        <tr id="imageSection">
-            <td>
-                image:
-            </td>
-            <td>
-                <input type="file" id="image" name="image">
-            </td>
-        </tr>
+                        <tr>
+                            <td>
+                                user type:
+                            </td>
+                            <td>
+                                <form:select path="userType" id="userType" onchange="updateDropDownList()" cssClass="space btn btn-light dropdown-toggle">
+                                    <form:option value="CUSTOMER" label="customer" cssClass="dropdown-item"/>
+                                    <form:option value="SPECIALIST" label="specialist" cssClass="dropdown-item"/>
+                                </form:select>
+                            </td>
 
-        <tr>
-            <td>
-                <input type="submit" value="sign up">
-            </td>
-        </tr>
+                        </tr>
 
-    </table>
-</form:form>
+                        <tr id="imageSection">
+                            <td>
+                                image:
+                            </td>
+                            <td>
+                                <div class="custom-file space">
+                                    <input type="file" class="custom-file-input" id="image" lang="es" name="image">
+                                    <label class="custom-file-label" for="image">select image</label>
+                                </div>
+                            </td>
+                        </tr>
 
+                        <tr>
+                            <td colspan="2"><input type="submit" value="sign up" class="btn btn-style button_style"><td/>
+                        </tr>
+
+                    </table>
+                </form:form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
 <script>
     const imageFile = document.getElementById("image");
 
@@ -86,8 +114,16 @@
         }
     }
 
-
-
 </script>
+<script
+        src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"
+></script>
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+        crossorigin="anonymous"
+></script>
 </body>
 </html>

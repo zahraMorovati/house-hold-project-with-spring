@@ -24,6 +24,8 @@
             </tr>
         </table>
         <br/> <br/>
+        <a href="/customer/saveOrder?email=${userDto.email}">add order</a>
+        <br/> <br/>
         <h2> customer order list</h2>
         <table border="1" cellpadding="5">
             <tr>

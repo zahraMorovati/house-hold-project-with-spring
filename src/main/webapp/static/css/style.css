@@ -1,0 +1,64 @@
+html,body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: linear-gradient(to right, #f8655a, #FFD54F);
+    background-repeat: no-repeat;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+.box{
+    height: 200px;
+    padding: 0.5rem;
+}
+
+.input-textBox{
+
+    display: block;
+    width: 100% !important;
+    background: #e6e6e6;
+    height: 50px;
+
+}
+
+.btn-style{
+  color: rgb(240, 232, 228);
+  display: block;
+  width: 100% !important;
+  background: #f77539;
+  height: 50px;
+  border-radius:5px;
+  margin-top: 8%;
+}
+.space{
+    margin: 6px;
+}
+
+.button_style{
+    margin: 25px 10px 10px;
+}
+
+.center{
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.box-user-saved{
+    background-color: white;
+    height: 100px;
+    width: 600px;
+    border-radius: 25px;
+    padding-left: 150px;
+    font-family: 'Calibri Light';
+    color: #f77539
+}
+
+
+
