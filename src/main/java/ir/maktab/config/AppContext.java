@@ -11,6 +11,8 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -19,7 +21,7 @@ import java.util.Properties;
 @PropertySource("classpath:database.properties")
 @Configuration
 @EnableTransactionManagement
-public class DatabaseConfig {
+public class AppContext {
 
     @Autowired
     private Environment environment;
@@ -39,7 +41,7 @@ public class DatabaseConfig {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
         entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        entityManagerFactoryBean.setPackagesToScan("ir.maktab.data.model");
+        entityManagerFactoryBean.setPackagesToScan("ir.maktab.data.entity");
         entityManagerFactoryBean.setJpaProperties(hibernateProperties());
 
         return entityManagerFactoryBean;
