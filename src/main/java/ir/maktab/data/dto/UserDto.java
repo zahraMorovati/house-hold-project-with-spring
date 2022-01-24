@@ -1,12 +1,26 @@
 package ir.maktab.data.dto;
 
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import ir.maktab.data.model.enums.UserState;
+import lombok.NoArgsConstructor;
+
+@Builder(setterPrefix = "set")
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class UserDto {
+
     private String name;
     private String family;
     private String email;
+    private String password;
     private double balance;
-    private UserState state;
+    private String userType;
+
+
+
+
+
 }
