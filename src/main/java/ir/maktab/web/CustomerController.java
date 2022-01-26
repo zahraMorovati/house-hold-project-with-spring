@@ -10,9 +10,7 @@ import ir.maktab.service.OrderServiceImpl;
 import ir.maktab.service.SubServiceServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,31 +35,28 @@ public class CustomerController {
         return mav;
     }
 
-    @RequestMapping("/saveOrder")
-    public ModelAndView addCustomerOrder(@RequestParam("email")String email) {
+    @GetMapping("/addOrder")
+    public ModelAndView addCustomerOrder(@RequestParam String email) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("saveOrderPage");
         Map<String, String> subServices = new HashMap<>();
         subServiceService.getAllSubServices().forEach(i -> subServices.put(i.getSubServiceName(), i.getSubServiceName()));
-        UserDto userDto = UserDto.builder().setEmail(email).build();
+        OrderDto orderDto = OrderDto.builder().setCustomer(email).build();
         mav.addObject("subServices", subServices);
-        mav.addObject("orderDto", new OrderDto());
-        mav.addObject("userDto",userDto);
+        mav.addObject("orderDto", orderDto);
         return mav;
     }
 
     @PostMapping("/saveOrder")
-    public ModelAndView saveCustomerOrder(@RequestParam("email") String email, @RequestParam("subService") String subServiceName,
-                                          @RequestParam("suggestedPrice") double suggestedPrice, @RequestParam("explanations") String explanations, @RequestParam("startDate") Date startDate, @RequestParam("city") String city, @RequestParam("plaque") String plaque,
-                                          @RequestParam("addressExplanations") String addressExplanations) {
+    public ModelAndView saveCustomerOrder(@ModelAttribute("orderDto") OrderDto orderDto) {
 
-        Customer customer = customerService.findByEmail(email);
-        SubService subService = subServiceService.findByName(subServiceName);
-        Address address = Address.builder().setCity(city).setPlaque(plaque).setExplanations(addressExplanations).build();
-        orderService.addCustomerOrder(customer, subService, suggestedPrice, explanations, address, startDate);
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("customerAccountPage");
-        return mav;
+        Customer customer = customerService.findByEmail(orderDto.getCustomer());
+        SubService subService = subServiceService.findByName(orderDto.getSubService());
+        Address address = new Address();
+        orderService.addCustomerOrder(customer, subService, orderDto.getSuggestedPrice(), orderDto.getExplanations(), address, orderDto.getStartDate());
+
+        ModelAndView modelAndView = new ModelAndView();
+        return UserController.getCustomerAccountModelAndView(modelAndView,customer,orderService);
 
     }
 }
