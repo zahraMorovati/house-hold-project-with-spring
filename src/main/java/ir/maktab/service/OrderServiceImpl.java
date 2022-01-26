@@ -165,7 +165,7 @@ public class OrderServiceImpl implements OrderService {
 
     private String getRandomCode(OrderDao orderDao) {
         Random random = new Random();
-        String code = random.ints(6).toString();
+        String code = String.valueOf(random.nextInt()).substring(0,5);
         int result = orderDao.findOrderByOrderCode(code).size();
         if (result <= 0) {
             return code;
