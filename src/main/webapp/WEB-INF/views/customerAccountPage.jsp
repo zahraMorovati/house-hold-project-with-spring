@@ -24,7 +24,7 @@
             </tr>
         </table>
         <br/> <br/>
-        <a href="/customer/saveOrder?email=${userDto.email}">add order</a>
+        <a href="/customer/addOrder?email=${userDto.email}">add order</a>
         <br/> <br/>
         <h2> customer order list</h2>
         <table border="1" cellpadding="5">
@@ -36,6 +36,7 @@
                 <th>registrationDate</th>
                 <th>startDate</th>
                 <th>specialist</th>
+                <th>order state</th>
                 <th>address</th>
                 <th>comment</th>
                 <th>point</th>
@@ -50,6 +51,7 @@
                     <td>${each_one.registrationDate}</td>
                     <td>${each_one.startDate}</td>
                     <td>${each_one.specialist}</td>
+                    <td>${each_one.orderState}</td>
                     <td>${each_one.address}</td>
                     <td>${each_one.comment}</td>
                     <td>${each_one.point}</td>
