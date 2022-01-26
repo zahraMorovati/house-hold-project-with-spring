@@ -8,9 +8,14 @@
 <div align="center">
     <h2>New order</h2>
 
-    <form:form action="/customer/saveOrder?email=${userDto.email}" method="post" modelAttribute="orderDto" >
+    <form:form action="/customer/saveOrder" method="post" modelAttribute="orderDto" >
         <table border="0" cellpadding="5">
 
+            <tr hidden>
+                <td>${orderDto.customer}
+                    <form:hidden path="customer"/>
+                </td>
+            </tr>
             <tr>
                 <td>subService: </td>
                 <td><form:select path="subService" items="${subServices}"/></td>
@@ -25,26 +30,26 @@
             </tr>
             <tr>
                 <td>startDate: </td>
-                <td><input path="startDate" type="date"/></td>
+                <td><form:input path="startDate"/></td>
             </tr>
             <tr>
                 <td colspan="2"><td>address: </td>
             </tr>
             <tr>
                 <td>city: </td>
-                <td><form:input path="addressDto.city"/></td>
+                <td><form:input path="city"/></td>
             </tr>
             <tr>
                 <td>city state: </td>
-                <td><form:input path="addressDto.cityState"/></td>
+                <td><form:input path="cityState"/></td>
             </tr>
             <tr>
                 <td>plaque: </td>
-                <td><form:input path="addressDto.plaque"/></td>
+                <td><form:input path="plaque"/></td>
             </tr>
             <tr>
                 <td>explanations: </td>
-                <td><form:input path="addressDto.explanations"/></td>
+                <td><form:input path="addressExplanations"/></td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" value="Save"></td>
