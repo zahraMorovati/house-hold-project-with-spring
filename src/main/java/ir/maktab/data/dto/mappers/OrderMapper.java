@@ -2,7 +2,9 @@ package ir.maktab.data.dto.mappers;
 
 import ir.maktab.data.dto.OrderDto;
 import ir.maktab.data.entity.Address;
+import ir.maktab.data.entity.Comment;
 import ir.maktab.data.entity.Order;
+import ir.maktab.data.entity.Specialist;
 
 public class OrderMapper {
 
@@ -18,6 +20,24 @@ public class OrderMapper {
     }
 
     private static OrderDto getOrderDto(Order order, String city, String cityState, String plaque, String explanations) {
+        Specialist specialist = order.getSpecialist();
+        Comment comment = order.getComment();
+        String specialistName = "";
+        String specialistFamily = "";
+        String commentExplanations = "";
+        double commentPoint = 0;
+        if (specialist != null) {
+            specialistName = specialist.getName();
+            specialistFamily = specialist.getFamily();
+        }
+        if(comment!=null){
+            commentExplanations = comment.getExplanations();
+            commentPoint = comment.getPoint();
+        }
+        return buildOrder(order, city, cityState, plaque, explanations, specialistName, specialistFamily, commentExplanations, commentPoint);
+    }
+
+    private static OrderDto buildOrder(Order order, String city, String cityState, String plaque, String explanations, String specialistName, String specialistFamily, String commentExplanations, double commentPoint) {
         return OrderDto.builder()
                 .setOrderCode(order.getOrderCode())
                 .setSubService(order.getSubService().getSubServiceName())
@@ -27,9 +47,9 @@ public class OrderMapper {
                 .setStartDate(order.getStartDate())
                 .setAddress(cityState + "  " + city + "  " + plaque + "  " + explanations)
                 .setOrderState(order.getOrderState().toString().toLowerCase())
-                .setSpecialist(order.getSpecialist().getName() + " " + order.getSpecialist().getFamily())
+                .setSpecialist(specialistName + " " + specialistFamily)
                 .setCustomer(order.getCustomer().getName() + " " + order.getCustomer().getFamily())
-                .setComment(order.getComment().getExplanations())
-                .setPoint(order.getComment().getPoint()).build();
+                .setComment(commentExplanations)
+                .setPoint(commentPoint).build();
     }
 }
