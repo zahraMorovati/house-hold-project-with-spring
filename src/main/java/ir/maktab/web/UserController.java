@@ -5,7 +5,6 @@ import ir.maktab.data.dto.UserDto;
 import ir.maktab.data.dto.mappers.UserMapper;
 import ir.maktab.data.entity.Customer;
 import ir.maktab.data.entity.Manager;
-import ir.maktab.data.entity.Order;
 import ir.maktab.data.entity.Specialist;
 import ir.maktab.service.*;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +60,7 @@ public class UserController {
         if(userType.equalsIgnoreCase("customer")){
             Customer customer = customerService.findByEmailAndPassword(email, password);
             if (customer != null) {
-                return getCustomerModelAndView(modelAndView, customer);
+                return getCustomerAccountModelAndView(modelAndView, customer,orderService);
             }
         }else if(userType.equalsIgnoreCase("specialist")){
             Specialist specialist = specialistService.findByEmailAndPassword(email, password);
@@ -97,7 +96,7 @@ public class UserController {
         return modelAndView;
     }
 
-    private ModelAndView getCustomerModelAndView(ModelAndView modelAndView, Customer customer) {
+    public static ModelAndView getCustomerAccountModelAndView(ModelAndView modelAndView, Customer customer,OrderServiceImpl orderService) {
         List<OrderDto> orderList = orderService.getCustomerOrders(customer.getEmail());
         UserDto customerDto = UserMapper.toUserDto(customer.getName(), customer.getFamily(), customer.getEmail(), customer.getBalance());
         modelAndView.setViewName("customerAccountPage");
