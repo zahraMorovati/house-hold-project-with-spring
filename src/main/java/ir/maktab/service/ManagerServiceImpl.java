@@ -15,16 +15,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class ManagerServiceImpl implements ManagerService {
 
-    ManagerDao managerDao;
-
-    @Autowired
-    public ManagerServiceImpl(ManagerDao managerDao) {
-        this.managerDao = managerDao;
-    }
+    private final ManagerDao managerDao;
 
     @Override
     public void save(Manager manager){

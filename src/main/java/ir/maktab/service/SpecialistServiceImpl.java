@@ -8,6 +8,7 @@ import ir.maktab.exception.UserEceptions.WrongEmailException;
 import ir.maktab.exception.specialistExceptions.CannotSaveSpecialistException;
 import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.interfaces.SpecialistService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,16 +19,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
+@RequiredArgsConstructor
 @Service
 public class SpecialistServiceImpl implements SpecialistService {
 
-    SpecialistDao specialistDao;
-
-    @Autowired
-    public SpecialistServiceImpl(SpecialistDao specialistDao) {
-        this.specialistDao = specialistDao;
-    }
+    private final SpecialistDao specialistDao;
 
     @Override
     public void save(Specialist specialist) {

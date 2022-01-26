@@ -7,30 +7,24 @@ import ir.maktab.data.entity.Service;
 import ir.maktab.exception.serviceExceptions.DuplicatedServiceException;
 import ir.maktab.exception.serviceExceptions.ServiceNotFoundException;
 import ir.maktab.service.interfaces.ServiceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-
+@RequiredArgsConstructor
 @org.springframework.stereotype.Service
 public class ServiceServiceImpl implements ServiceService {
 
-    ServiceDao serviceDao;
-
-    @Autowired
-    public ServiceServiceImpl(ServiceDao serviceDao) {
-        this.serviceDao = serviceDao;
-    }
+    private final ServiceDao serviceDao;
 
     @Override
     public void save(ServiceDto serviceDto) {
 
         int result = serviceDao.findByServiceName(serviceDto.getName()).size();
-
         if (result <= 0) {
             Service service = ServiceMapper.toService(serviceDto);
             serviceDao.save(service);

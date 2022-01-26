@@ -13,6 +13,7 @@ import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.exception.subServiceExceptions.DuplicatedSubServiceException;
 import ir.maktab.exception.subServiceExceptions.SubServiceNotFoundException;
 import ir.maktab.service.interfaces.SubServiceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,18 +22,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
+@RequiredArgsConstructor
 @Service
 public class SubServiceServiceImpl implements SubServiceService {
 
-    SubServiceDao subServiceDao;
-    SpecialistDao specialistDao;
-
-    @Autowired
-    public SubServiceServiceImpl(SubServiceDao subServiceDao, SpecialistDao specialistDao) {
-        this.subServiceDao = subServiceDao;
-        this.specialistDao = specialistDao;
-    }
+    private final SubServiceDao subServiceDao;
+    private final SpecialistDao specialistDao;
 
     @Override
     public void save(SubServiceDto subServiceDto) {

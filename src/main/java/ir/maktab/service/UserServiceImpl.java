@@ -8,21 +8,16 @@ import ir.maktab.data.entity.Specialist;
 import ir.maktab.data.enums.UserState;
 import ir.maktab.exception.UserEceptions.DuplicatedEmailException;
 import ir.maktab.service.interfaces.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
-    CustomerDao customerDao;
-    SpecialistDao specialistDao;
-
-    @Autowired
-    public UserServiceImpl(CustomerDao customerDao, SpecialistDao specialistDao) {
-        this.customerDao = customerDao;
-        this.specialistDao = specialistDao;
-    }
+    private final CustomerDao customerDao;
+    private final SpecialistDao specialistDao;
 
     @Override
     public void saveUserByType(UserDto userDto, CommonsMultipartFile image) {

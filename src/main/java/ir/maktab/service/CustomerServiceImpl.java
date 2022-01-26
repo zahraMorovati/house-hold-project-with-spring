@@ -19,19 +19,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
+@RequiredArgsConstructor
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    CustomerDao customerDao;
-
-    @Autowired
-    public CustomerServiceImpl(CustomerDao customerDao) {
-        this.customerDao = customerDao;
-    }
+    private final CustomerDao customerDao;
 
     @Override
-    public void save(Customer customer) { //todo add mapp class customerMapper - customerDto to customer
+    public void save(Customer customer) { //todo add mapper class customerMapper - customerDto to customer
         customerDao.save(customer);
         if (customer.getId() < 0)
             throw new CannotSaveCustomerException();

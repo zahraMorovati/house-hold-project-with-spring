@@ -19,20 +19,13 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class SuggestionServiceImpl implements SuggestionService {
 
-    SuggestionDao suggestionDao;
-    OrderDao orderDao;
-    SpecialistDao specialistDao;
-
-    @Autowired
-    public SuggestionServiceImpl(SuggestionDao suggestionDao, OrderDao orderDao, SpecialistDao specialistDao) {
-        this.suggestionDao = suggestionDao;
-        this.orderDao = orderDao;
-        this.specialistDao = specialistDao;
-    }
+    private final SuggestionDao suggestionDao;
+    private final OrderDao orderDao;
+    private final SpecialistDao specialistDao;
 
     @Override
     public Suggestion findById(int id) {

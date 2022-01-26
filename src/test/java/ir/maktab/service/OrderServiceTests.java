@@ -1,11 +1,11 @@
 package ir.maktab.service;
 
-import ir.maktab.config.SpringConfig;
+
 import ir.maktab.data.entity.*;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Date;
 import java.util.List;
@@ -13,12 +13,21 @@ import java.util.List;
 @DataJpaTest
 public class OrderServiceTests {
 
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
-    OrderServiceImpl orderService = (OrderServiceImpl) context.getBean(OrderServiceImpl.class);
-    CustomerServiceImpl customerService = (CustomerServiceImpl) context.getBean(CustomerServiceImpl.class);
-    SubServiceServiceImpl subServiceService = (SubServiceServiceImpl) context.getBean(SubServiceServiceImpl.class);
-    SpecialistServiceImpl specialistService=(SpecialistServiceImpl) context.getBean(SpecialistServiceImpl.class);
-    SuggestionServiceImpl suggestionService=(SuggestionServiceImpl) context.getBean(SuggestionServiceImpl.class);
+
+     OrderServiceImpl orderService ;
+     CustomerServiceImpl customerService ;
+     SubServiceServiceImpl subServiceService ;
+     SpecialistServiceImpl specialistService;
+     SuggestionServiceImpl suggestionService;
+
+     @Autowired
+    public OrderServiceTests(OrderServiceImpl orderService, CustomerServiceImpl customerService, SubServiceServiceImpl subServiceService, SpecialistServiceImpl specialistService, SuggestionServiceImpl suggestionService) {
+        this.orderService = orderService;
+        this.customerService = customerService;
+        this.subServiceService = subServiceService;
+        this.specialistService = specialistService;
+        this.suggestionService = suggestionService;
+    }
 
     @Test
     public void add_customer_order(){
