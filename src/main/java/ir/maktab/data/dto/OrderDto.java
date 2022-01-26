@@ -28,5 +28,9 @@ public class OrderDto {
     private String customer;
     private String comment;
     private double point;
+    private String city;
+    private String cityState; //استان
+    private String plaque;
+    private String addressExplanations;
 
 }
