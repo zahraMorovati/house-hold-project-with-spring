@@ -1,8 +1,9 @@
 package ir.maktab.service.interfaces;
 
-import ir.maktab.data.dto.UserDto;
+import ir.maktab.data.dto.CustomerDto;
 import ir.maktab.data.entity.Customer;
 
+import java.util.Date;
 import java.util.List;
 
 public interface CustomerService {
@@ -17,13 +18,22 @@ public interface CustomerService {
 
     void changePassword(String email, String newPassword);
 
-    Customer findById(int id); //todo
+    Customer findById(int id);
 
-    List<Customer> filterByNameOrFamilyOrEmail(String name, String family, String email); //todo
-
-    List<UserDto> getAllCustomers();
+    List<CustomerDto> getAllCustomers();
 
     Customer findByEmail(String email);
 
     Customer findByEmailAndPassword(String email, String password);
+
+    List<CustomerDto> filterCustomers(String name, String family, String email);
+
+    List<CustomerDto> advancedFilterCustomers(String name, String family, String email,
+                                              String startingRegistrationDate,
+                                              String endingRegistrationDate,
+                                              Integer minOrderNumber,Integer maxOrderNumber);
+
+
+
+
 }
