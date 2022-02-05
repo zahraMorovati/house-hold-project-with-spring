@@ -1,24 +1,30 @@
 package ir.maktab.service;
 
 import ir.maktab.data.dao.interfaces.SpecialistDao;
-import ir.maktab.data.dto.UserDto;
-import ir.maktab.data.dto.mappers.UserMapper;
+import ir.maktab.data.dto.SpecialistDto;
+import ir.maktab.data.dto.mappers.SpecialistMapper;
 import ir.maktab.data.entity.Specialist;
 import ir.maktab.exception.UserEceptions.WrongEmailException;
 import ir.maktab.exception.specialistExceptions.CannotSaveSpecialistException;
 import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.interfaces.SpecialistService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static ir.maktab.util.Convert.parsDate;
+
 @RequiredArgsConstructor
 @Service
 public class SpecialistServiceImpl implements SpecialistService {
@@ -28,8 +34,7 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Override
     public void save(Specialist specialist) {
         specialistDao.save(specialist);
-        if (specialist.getId() < 0)
-            throw new CannotSaveSpecialistException();
+        if (specialist.getId() < 0) throw new CannotSaveSpecialistException();
     }
 
     @Override
@@ -39,7 +44,7 @@ public class SpecialistServiceImpl implements SpecialistService {
 
     @Override
     public void update(Specialist specialist) {
-        specialistDao.update(specialist.getName(), specialist.getFamily(), specialist.getEmail(), specialist.getPassword(), specialist.getBalance(), specialist.getId());
+        specialistDao.save(specialist);
     }
 
     @Override
@@ -58,18 +63,8 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Override
     public Specialist findById(int id) {
         Optional<Specialist> optionalSpecialist = specialistDao.findById(id);
-        if (optionalSpecialist.isPresent())
-            return optionalSpecialist.get();
+        if (optionalSpecialist.isPresent()) return optionalSpecialist.get();
         else throw new SpecialistNotFoundException();
-    }
-
-    @Override
-    public List<Specialist> filterByNameOrFamilyOrEmail(String name, String family, String email) {
-        List<Specialist> specialists = specialistDao.findSpecialistByNameOrFamilyOrEmail(name, family, email);
-        if (!specialists.isEmpty())
-            return specialists;
-        else throw new SpecialistNotFoundException();
-
     }
 
     @Override
@@ -78,12 +73,9 @@ public class SpecialistServiceImpl implements SpecialistService {
     }
 
     @Override
-    public List<UserDto> getAllSpecialists() {
-        List<Specialist> specialists = StreamSupport
-                .stream(specialistDao.findAll().spliterator(), false)
-                .collect(Collectors.toList());
-        return specialists.stream()
-                .map(i -> UserMapper.toUserDto(i.getName(), i.getFamily(), i.getEmail())).collect(Collectors.toList());
+    public List<SpecialistDto> getAllSpecialists() {
+        List<Specialist> specialists = StreamSupport.stream(specialistDao.findAll().spliterator(), false).collect(Collectors.toList());
+        return specialists.stream().map(SpecialistMapper::toSpecialistDto).collect(Collectors.toList());
 
     }
 
@@ -97,11 +89,34 @@ public class SpecialistServiceImpl implements SpecialistService {
 
     @Override
     public Specialist findByEmailAndPassword(String email, String password) {
-        List<Specialist> result = specialistDao.findSpecialistByEmailAndPassword(email,password);
+        List<Specialist> result = specialistDao.findSpecialistByEmailAndPassword(email, password);
         if (result.size() >= 1) {
             return result.get(0);
         } else throw new SpecialistNotFoundException();
     }
+
+    @Override
+    public List<SpecialistDto> filterSpecialists(String name, String family, String email) {
+        Specification<Specialist> specification = SpecialistDao.filterSpecialists(name, family, email);
+        return specialistDao.findAll(specification).stream().map(SpecialistMapper::toSpecialistDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SpecialistDto> advancedFilterSpecialists(String name, String family, String email, String startingRegistrationDate, String endingRegistrationDate, Integer minOrderNumber, Integer maxOrderNumber) {
+
+        Date startingDate = parsDate(startingRegistrationDate);
+        Date endingDate = parsDate(startingRegistrationDate);
+
+        int minNumber = 0;
+        int maxNumber = 0;
+        if (minOrderNumber != null) minNumber = minOrderNumber;
+        if (maxOrderNumber != null) maxNumber = maxOrderNumber;
+
+        Specification<Specialist> specification = SpecialistDao.advancedFilter(name, family, email, startingDate, endingDate, minOrderNumber, maxOrderNumber);
+        return specialistDao.findAll(specification).stream().map(SpecialistMapper::toSpecialistDto).collect(Collectors.toList());
+    }
+
+
 
 
 }
