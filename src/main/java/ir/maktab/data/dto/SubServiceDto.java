@@ -1,10 +1,10 @@
 package ir.maktab.data.dto;
 
 import ir.maktab.data.entity.Service;
-import ir.maktab.data.entity.Specialist;
-import lombok.*;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder(setterPrefix = "set")
 @AllArgsConstructor
@@ -16,5 +16,4 @@ public class SubServiceDto {
     private String subServiceName;
     private double price;
     private String explanations;
-    private List<Specialist> specialists = new ArrayList<>();
 }
