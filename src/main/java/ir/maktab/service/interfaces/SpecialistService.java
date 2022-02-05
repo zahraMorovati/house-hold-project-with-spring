@@ -1,11 +1,11 @@
 package ir.maktab.service.interfaces;
 
-import ir.maktab.data.dto.UserDto;
-import ir.maktab.data.entity.Customer;
+import ir.maktab.data.dto.SpecialistDto;
 import ir.maktab.data.entity.Specialist;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 public interface SpecialistService {
@@ -16,19 +16,24 @@ public interface SpecialistService {
 
     void update(Specialist specialist);
 
-    Iterable<Specialist> findAll(int page , int size);
+    Iterable<Specialist> findAll(int page, int size);
 
-    void changePassword(String email,String newPassword);
+    void changePassword(String email, String newPassword);
 
     Specialist findById(int id);
 
-    List<Specialist> filterByNameOrFamilyOrEmail(String name, String family, String email);
+    void uploadSpecialistImage(Specialist specialist, CommonsMultipartFile image) throws IOException;
 
-    void uploadSpecialistImage(Specialist specialist , CommonsMultipartFile image) throws IOException;
-
-    List<UserDto> getAllSpecialists();
+    List<SpecialistDto> getAllSpecialists();
 
     Specialist findByEmail(String email);
 
     Specialist findByEmailAndPassword(String email, String password);
+
+    List<SpecialistDto> filterSpecialists(String name, String family, String email);
+
+    List<SpecialistDto> advancedFilterSpecialists(String name, String family, String email,
+                                                  String startingRegistrationDate,
+                                                  String endingRegistrationDate,
+                                                  Integer minOrderNumber, Integer maxOrderNumber);
 }
