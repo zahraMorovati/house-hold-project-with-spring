@@ -34,7 +34,7 @@ public class Suggestion {
     @Temporal(value = TemporalType.TIME)
     private Date startTime;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.MERGE)
     private Specialist specialist;
 
     @ManyToOne(cascade = CascadeType.MERGE)
