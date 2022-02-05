@@ -8,7 +8,7 @@
 <body>
 <div align="center">
     <h2>New Service</h2>
-    <form:form action="/service/save" method="post" modelAttribute="newServiceObject">
+    <form:form action="/manager/saveService?email=${email}" method="post" modelAttribute="newServiceObject">
         <table border="0" cellpadding="5">
             <tr>
                 <td>Name: </td>

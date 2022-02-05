@@ -6,11 +6,13 @@
 </head>
 <body>
 <h1>manager account</h1>
-
-<a href="/service/new">add service</a><br/><br/>
-<a href="/subService/new">add subservice</a><br/><br/>
-<a href="/specialist/list">list specialists</a><br/><br/>
-<a href="/customer/list">list customers</a>
+${userDto.name}<br/><br/>
+${userDto.family}<br/><br/>
+${userDto.email}<br/><br/>
+<a href="/manager/newService?email=${userDto.email}">add service</a><br/><br/>
+<a href="/manager/newSubService?email=${userDto.email}">add subservice</a><br/><br/>
+<a href="/manager/listSpecialist?mEmail=${userDto.email}&name=&family=&email=">list specialists</a><br/><br/>
+<a href="/manager/listCustomer?mEmail=${userDto.email}&name=&family=&email=">list customers</a>
 
 </body>
 </html>

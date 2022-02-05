@@ -31,7 +31,8 @@
         <div style="background-color: white; height: 650px; width: 500px; border-radius: 5%;" >
             <div class=" p-5 justify-content-center m-4">
                 <h4 class="text-center" style="margin-bottom: 30px; font-size: 30px" >Sign up</h4>
-                <form:form modelAttribute="userDto" action="/user/signup" method="post" enctype="multipart/form-data">
+                <p class="text-danger">${error}</p>
+                <form:form modelAttribute="userDto" action="/signup" method="post" enctype="multipart/form-data">
                     <table border="0" cellpadding="5">
                         <tr>
                             <td>name:</td>

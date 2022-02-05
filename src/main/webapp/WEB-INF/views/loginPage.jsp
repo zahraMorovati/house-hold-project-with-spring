@@ -29,16 +29,16 @@
 
             <div class=" p-5 justify-content-center m-4">
                 <h4 class="text-center" style="margin-bottom: 30px; font-size: 30px" >login</h4>
-
-                <form:form action="/user/login" method="post" >
+                <p class="text-danger">${error}</p>
+                <form:form action="/login" method="post" >
                     <table border="0" cellpadding="5">
                         <tr>
                             <td>email: </td>
-                            <td><input name="email" type="email" class="form-control space"/></td>
+                            <td><input id="email" name="email" type="email" class="form-control space"/></td>
                         </tr>
                         <tr>
                             <td>password: </td>
-                            <td><input name="password" type="password" class="form-control space"/></td>
+                            <td><input id="password" name="password" type="password" class="form-control space"/></td>
                         </tr>
                         <tr>
                             <td>user type:</td>

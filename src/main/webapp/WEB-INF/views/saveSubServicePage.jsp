@@ -6,7 +6,7 @@
     <title>save subService</title>
 </head>
 <body>
-<form:form action="/subService/save" method="post" modelAttribute="newSubServiceObject" enctype="multipart/form-data">
+<form:form action="/manager/saveSubService?email=${email}" method="post" modelAttribute="newSubServiceObject" enctype="multipart/form-data">
     <table border="0" cellpadding="5">
         <tr>
             <td>service: </td>

@@ -9,7 +9,7 @@
 <div align="center">
     <h2>list specialists</h2>
 
-    <form:form action="/subService/list" method="post">
+    <form:form action="/manager/listSubService" method="post">
         <table border="1" cellpadding="5">
             <tr>
                 <th>Name</th>
@@ -24,7 +24,7 @@
                     <td>${each_one.price}</td>
                     <td>${each_one.explanations}</td>
                     <td>
-                        <a href="saveSubServiceWithSpecialist?email=${specialist.email}&subServiceName=${each_one.subServiceName}">add</a>
+                        <a href="/manager/saveSubServiceWithSpecialist?email=${specialist.email}&subServiceName=${each_one.subServiceName}">add</a>
                     </td>
                 </tr>
             </c:forEach>
