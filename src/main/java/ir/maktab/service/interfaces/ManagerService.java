@@ -21,4 +21,6 @@ public interface ManagerService {
     List<Manager> filterByNameOrFamilyOrEmail(String name, String family, String email); //todo
 
     Manager findByEmailAndPassword(String email, String password);
+
+    Manager findByEmail(String email);
 }
