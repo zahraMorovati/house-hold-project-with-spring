@@ -28,5 +28,11 @@ public interface SubServiceDao extends PagingAndSortingRepository<SubService, In
     List<SubService> findSubServiceBySubServiceName(String subServiceName);
 
 
+    @Query(value = "select subServiceName from subservice_specialist join subservice s on subservice_specialist.SubService_id = s.id where specialists_id=:id", nativeQuery = true)
+    List<String> findSubServiceNameBySpecialistId(@Param("id") int id);
+
+    @Query("from SubService s where s.service.serviceName=:name")
+    List<SubService> findSubServiceByServiceName(String name);
+
 
 }
