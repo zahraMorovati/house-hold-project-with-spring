@@ -1,22 +1,25 @@
 package ir.maktab.service;
 
-import ir.maktab.data.dao.interfaces.CustomerDao;
-import ir.maktab.data.dao.interfaces.OrderDao;
-import ir.maktab.data.dao.interfaces.SpecialistDao;
-import ir.maktab.data.dao.interfaces.SubServiceDao;
+import ir.maktab.data.dao.interfaces.*;
 import ir.maktab.data.dto.OrderDto;
 import ir.maktab.data.dto.mappers.OrderMapper;
 import ir.maktab.data.entity.*;
 import ir.maktab.data.enums.OrderState;
+import ir.maktab.data.enums.UserState;
+import ir.maktab.exception.UserEceptions.UserNotConfirmedException;
+import ir.maktab.exception.customerExceptions.BalanceIsNotEnoughException;
 import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
 import ir.maktab.exception.orderExceptions.CannotSaveOrderException;
+import ir.maktab.exception.orderExceptions.MaxReachedOrderNumberException;
 import ir.maktab.exception.orderExceptions.OrderNotFoundException;
+import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.exception.subServiceExceptions.SubServiceNotFoundException;
-import ir.maktab.exception.suggestionExceptions.EmptySuggestionList;
+import ir.maktab.exception.suggestionExceptions.SuggestedPriceIsHigherThanBasePriceException;
 import ir.maktab.exception.suggestionExceptions.SuggestionNotFoundException;
 import ir.maktab.service.interfaces.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -24,6 +27,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static ir.maktab.util.Convert.parsDate;
+import static ir.maktab.util.Convert.toOrderState;
 
 @RequiredArgsConstructor
 @Service
@@ -33,6 +39,9 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerDao customerDao;
     private final SubServiceDao subServiceDao;
     private final SpecialistDao specialistDao;
+    private final SuggestionDao suggestionDao;
+    private final int customerMaxOrders = 5;
+    private final double specialistFeeRange = 0.7;
 
     @Override
     public void save(Order order) {
@@ -48,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void update(Order order) {
-        orderDao.update(order.getSubService(), order.getSuggestedPrice(), order.getExplanations(), order.getStartDate(), order.getAddress(), order.getId());
+        orderDao.save(order);
     }
 
     @Override
@@ -75,27 +84,28 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void addCustomerOrder(Customer customer, SubService subService, double suggestedPrice,
                                  String explanations, Address address, Date startDate) {
-        //check customer existence
+
         Optional<Customer> optionalCustomer = customerDao.findById(customer.getId());
         if (optionalCustomer.isPresent()) {
-            //check subService existence
-            //todo check customer orders is unfinished
-            Optional<SubService> optionalSubService = subServiceDao.findById(subService.getId());
-            if (optionalSubService.isPresent()) {
+            customer = optionalCustomer.get();
+            if (customer.getState().equals(UserState.CONFIRMED)) {
+                int customerUnfinishedOrders = orderDao.findOrderByCustomer_Email(customer.getEmail()).stream().map(i -> i.getOrderState() != OrderState.DONE).collect(Collectors.toList()).size();
+                if (customerUnfinishedOrders < customerMaxOrders) {
+                    Optional<SubService> optionalSubService = subServiceDao.findById(subService.getId());
+                    if (optionalSubService.isPresent()) {
+                        if (subService.getPrice() > suggestedPrice) {
 
-                customer = optionalCustomer.get();
-                subService = optionalSubService.get();
+                            subService = optionalSubService.get();
+                            String code = getRandomCode(orderDao);
+                            Order order = getOrder(customer, subService, suggestedPrice, explanations, address, startDate, code);
+                            orderDao.save(order);
 
-                String code = getRandomCode(orderDao);
-                Order order = getOrder(customer, subService, suggestedPrice, explanations, address, startDate, code);
-                orderDao.save(order);
-            }else throw new SubServiceNotFoundException();
-
+                        } else throw new SuggestedPriceIsHigherThanBasePriceException();
+                    } else throw new SubServiceNotFoundException();
+                } else throw new MaxReachedOrderNumberException();
+            } else throw new UserNotConfirmedException();
         } else throw new CustomerNotFoundException();
-
     }
-
-
 
     private Order getOrder(Customer customer, SubService subService, double suggestedPrice, String explanations, Address address, Date startDate, String orderCode) {
         Order order = Order.builder()
@@ -112,42 +122,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void selectSpecialistSuggestion(Order order, Suggestion suggestion) {
+    public void selectSpecialistSuggestion(String orderCode, String suggestionCode) {
 
-        // check order existence
-        Optional<Order> optionalOrder = orderDao.findById(order.getId());
+        List<Order> orders = orderDao.findOrderByOrderCode(orderCode);
 
-        if (optionalOrder.isPresent()) {
-            order = optionalOrder.get();
-            int suggestionId = suggestion.getId();
-            Optional<Suggestion> optionalSuggestion = order.getSuggestions().stream().filter(i -> i.getId() == suggestionId).findAny();
-            if (optionalSuggestion.isPresent()) {
+        if (orders.size() >= 1) {
+            Order order = orders.get(0);
+            List<Suggestion> resultSuggestions = suggestionDao.findSuggestionBySuggestionCode(suggestionCode);
+            if (!resultSuggestions.isEmpty()) {
 
-                suggestion = optionalSuggestion.get();
-                order.setSpecialist(suggestion.getSpecialist());
-                order.setOrderState(OrderState.WAITING_FOR_SPECIALIST_TO_COME);
-                orderDao.save(order);
+                updateOrderState(order, OrderState.WAITING_FOR_SPECIALIST_TO_COME);
+                Suggestion suggestion = resultSuggestions.get(0);
+                orderDao.selectSpecialist(suggestion.getSpecialist().getId(), order.getOrderCode());
 
             } else throw new SuggestionNotFoundException();
-
-        } else throw new OrderNotFoundException();
-    }
-
-    @Override
-    public List<Suggestion> getOrderSuggestions(Order order) {
-
-        Optional<Order> optionalOrder = orderDao.findById(order.getId());
-        if (optionalOrder.isPresent()) {
-            order = optionalOrder.get();
-            List<Suggestion> suggestions = order.getSuggestions();
-            if (!suggestions.isEmpty()) {
-                /*suggestions.sort(Comparator.comparingDouble(Suggestion::getSuggestedPrice)
-                        .thenComparing((o1, o2) -> Double.compare(o1.getSpecialist().getPoint(),
-                                o2.getSpecialist().getPoint())));*/
-
-                return suggestions;
-
-            } else throw new EmptySuggestionList();
         } else throw new OrderNotFoundException();
     }
 
@@ -163,13 +151,99 @@ public class OrderServiceImpl implements OrderService {
         return orderList.stream().map(OrderMapper::toOrderDto).collect(Collectors.toList());
     }
 
+    @Override
+    public List<OrderDto> getSpecialistAvailableOrders(String email) {
+        List<Specialist> result = specialistDao.findSpecialistByEmail(email);
+        if (!result.isEmpty()) {
+            Specialist specialist = result.get(0);
+            List<String> specialistAvailableOrderCods = orderDao.findSpecialistAvailableOrders(specialist.getId());
+            return specialistAvailableOrderCods.stream().map(i -> orderDao.findOrderByOrderCode(i).get(0)).map(OrderMapper::toOrderDto).collect(Collectors.toList());
+        } else throw new SpecialistNotFoundException();
+    }
+
+    @Override
+    public List<OrderDto> getCustomerOrdersByOrderState(String email, OrderState orderState) {
+        List<Order> orderList = orderDao.findOrderByCustomer_Email(email);
+        return orderList.stream().filter(i -> i.getOrderState() == OrderState.DONE).map(OrderMapper::toOrderDto).collect(Collectors.toList());
+    }
+
     private String getRandomCode(OrderDao orderDao) {
         Random random = new Random();
-        String code = String.valueOf(random.nextInt()).substring(0,5);
-        int result = orderDao.findOrderByOrderCode(code).size();
-        if (result <= 0) {
-            return code;
-        } else return getRandomCode(orderDao);
+        int randomNumber = random.nextInt();
+        if (randomNumber < 0) {
+            return getRandomCode(orderDao);
+        } else {
+            String code = String.valueOf(randomNumber).substring(0, 5);
+            int result = orderDao.findOrderByOrderCode(code).size();
+            if (result <= 0) {
+                return code;
+            } else return getRandomCode(orderDao);
+        }
+    }
+
+    @Override
+    public void paymentByBalance(String customerEmail, String orderCode) {
+        List<Customer> customerResult = customerDao.findCustomerByEmail(customerEmail);
+        if (!customerResult.isEmpty()) {
+            Customer customer = customerResult.get(0);
+            List<Order> orderResult = orderDao.findOrderByOrderCode(orderCode);
+            if (!orderResult.isEmpty()) {
+                Order order = orderResult.get(0);
+                double suggestedPrice = order.getSuggestedPrice();
+                if (customer.getBalance() > suggestedPrice) {
+
+                    updateSpecialistBalance(order, suggestedPrice);
+                    updateCustomerBalance(customer, suggestedPrice);
+                    updateOrderState(order, OrderState.PAID);
+
+                } else throw new BalanceIsNotEnoughException();
+            } else throw new OrderNotFoundException();
+        } else throw new CustomerNotFoundException();
+    }
+
+    private void updateCustomerBalance(Customer customer, double suggestedPrice) {
+        double customerBalance = customer.getBalance();
+        customerBalance -= suggestedPrice;
+        customer.setBalance(customerBalance);
+        customerDao.save(customer);
+    }
+
+
+    @Override
+    public void paymentByCard(String customerEmail, String orderCode) {
+
+        List<Customer> customerResult = customerDao.findCustomerByEmail(customerEmail);
+        if (!customerResult.isEmpty()) {
+            List<Order> orderResult = orderDao.findOrderByOrderCode(orderCode);
+            if (!orderResult.isEmpty()) {
+                Order order = orderResult.get(0);
+                double suggestedPrice = order.getSuggestedPrice();
+                updateSpecialistBalance(order, suggestedPrice);
+                updateOrderState(order, OrderState.PAID);
+            } else throw new OrderNotFoundException();
+        } else throw new CustomerNotFoundException();
+    }
+
+    @Override
+    public List<OrderDto> orderAdvancedFilter(String startDate, String endDate, String orderState, String serviceName, String subServiceName) {
+        Date orderStartDate = parsDate(startDate);
+        Date orderEndDate = parsDate(endDate);
+        Specification<Order> specification = OrderDao.filterOrders(orderStartDate, orderEndDate, toOrderState(orderState), serviceName, subServiceName);
+        return orderDao.findAll(specification).stream()
+                .map(OrderMapper::toOrderDto).collect(Collectors.toList());
+    }
+
+    private void updateOrderState(Order order, OrderState paid) {
+        order.setOrderState(paid);
+        orderDao.save(order);
+    }
+
+    private void updateSpecialistBalance(Order order, double suggestedPrice) {
+        Specialist specialist = order.getSpecialist();
+        double specialistBalance = specialist.getBalance();
+        specialistBalance += suggestedPrice * (specialistFeeRange);
+        specialist.setBalance(specialistBalance);
+        specialistDao.save(specialist);
     }
 
 
