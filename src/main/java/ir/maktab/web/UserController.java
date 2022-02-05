@@ -1,26 +1,29 @@
 package ir.maktab.web;
 
 import ir.maktab.data.dto.OrderDto;
+import ir.maktab.data.dto.SubServiceDto;
 import ir.maktab.data.dto.UserDto;
 import ir.maktab.data.dto.mappers.UserMapper;
 import ir.maktab.data.entity.Customer;
 import ir.maktab.data.entity.Manager;
+import ir.maktab.data.entity.Order;
 import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.enums.OrderState;
+import ir.maktab.exception.UserEceptions.DuplicatedEmailException;
+import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
+import ir.maktab.exception.managerExceptions.ManagerNotFoundException;
+import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-@RequestMapping("/user")
 @Controller
 public class UserController {
 
@@ -29,8 +32,9 @@ public class UserController {
     private final SpecialistServiceImpl specialistService;
     private final ManagerServiceImpl managerService;
     private final OrderServiceImpl orderService;
+    private final SubServiceServiceImpl subServiceService;
 
-    @RequestMapping("/new")
+    @RequestMapping("/newUser")
     public String newUser(Map<String, Object> model) {
         UserDto userDto = new UserDto();
         model.put("userDto", userDto);
@@ -65,7 +69,7 @@ public class UserController {
         }else if(userType.equalsIgnoreCase("specialist")){
             Specialist specialist = specialistService.findByEmailAndPassword(email, password);
             if (specialist != null) {
-                return getSpecialistModelAndView(modelAndView, specialist);
+                return getSpecialistModelAndView(modelAndView, specialist,orderService,subServiceService);
             }
         }else if(userType.equalsIgnoreCase("manager")){
             Manager manager = managerService.findByEmailAndPassword(email, password);
@@ -79,30 +83,68 @@ public class UserController {
         return modelAndView;
     }
 
-    private ModelAndView getManagerModelAndView(ModelAndView modelAndView, Manager manager) {
+    public static ModelAndView getManagerModelAndView(ModelAndView modelAndView, Manager manager) {
         UserDto managerDto = UserMapper.toUserDto(manager.getName(), manager.getFamily(), manager.getEmail());
         modelAndView.setViewName("managerAccountPage");
         modelAndView.addObject("userDto", managerDto);
         return modelAndView;
     }
 
-    private ModelAndView getSpecialistModelAndView(ModelAndView modelAndView, Specialist specialist) {
+    public static ModelAndView getSpecialistModelAndView(ModelAndView modelAndView, Specialist specialist,OrderServiceImpl orderService,SubServiceServiceImpl subServiceService){
         List<OrderDto> orderList = orderService.getSpecialistOrders(specialist.getEmail());
         UserDto specialistDto = UserMapper.toUserDto(specialist.getName(), specialist.getFamily(), specialist.getEmail(), specialist.getBalance());
+        List<String> subServices = subServiceService.getSpecialistSubServices(specialist.getEmail());
+        List<OrderDto> availableOrders = orderService.getSpecialistAvailableOrders(specialist.getEmail());
+        List<OrderDto> specialistOrders = orderService.getSpecialistOrders(specialist.getEmail());
+        //todo add pic
         modelAndView.setViewName("specialistAccountPage");
         modelAndView.addObject("userDto", specialistDto);
         modelAndView.addObject("orders", orderList);
-        // add pic
+        modelAndView.addObject("subServices",subServices);
+        modelAndView.addObject("availableOrders",availableOrders);
+        modelAndView.addObject("specialistOrders",specialistOrders);
+
         return modelAndView;
     }
 
     public static ModelAndView getCustomerAccountModelAndView(ModelAndView modelAndView, Customer customer,OrderServiceImpl orderService) {
         List<OrderDto> orderList = orderService.getCustomerOrders(customer.getEmail());
+        List<OrderDto> paymentOrders = orderService.getCustomerOrdersByOrderState(customer.getEmail(), OrderState.DONE);
         UserDto customerDto = UserMapper.toUserDto(customer.getName(), customer.getFamily(), customer.getEmail(), customer.getBalance());
         modelAndView.setViewName("customerAccountPage");
         modelAndView.addObject("userDto", customerDto);
         modelAndView.addObject("orders", orderList);
+        modelAndView.addObject("paymentOrders",paymentOrders);
         return modelAndView;
+    }
+
+    @ExceptionHandler(value = CustomerNotFoundException.class)
+    public ModelAndView loginExceptionHandler(CustomerNotFoundException ex) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("error", "wrong email or password!");
+        return new ModelAndView("loginPage", model);
+    }
+
+    @ExceptionHandler(value = SpecialistNotFoundException.class)
+    public ModelAndView loginExceptionHandler(SpecialistNotFoundException ex) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("error", "wrong email or password!");
+        return new ModelAndView("loginPage", model);
+    }
+
+    @ExceptionHandler(value = ManagerNotFoundException.class)
+    public ModelAndView loginExceptionHandler(ManagerNotFoundException ex) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("error", "wrong email or password!");
+        return new ModelAndView("loginPage", model);
+    }
+
+    @ExceptionHandler(value = DuplicatedEmailException.class)
+    public ModelAndView signupExceptionHandler(DuplicatedEmailException ex) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("error", "this email has been used before!");
+        model.put("userDto", new UserDto());
+        return new ModelAndView("signup", model);
     }
 
 }
