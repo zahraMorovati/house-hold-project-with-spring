@@ -21,7 +21,7 @@ public class OrderDto {
     private double suggestedPrice;
     private String explanations;
     private Date registrationDate;
-    private Date startDate;
+    private String startDate;
     private String address;
     private String orderState;
     private String specialist;
@@ -32,5 +32,6 @@ public class OrderDto {
     private String cityState; //استان
     private String plaque;
     private String addressExplanations;
+    private String specialistEmail;
 
 }
