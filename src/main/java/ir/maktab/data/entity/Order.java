@@ -61,7 +61,7 @@ public class Order {
     @ManyToOne(cascade = {CascadeType.MERGE})
     private Customer customer;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.MERGE)
     private Comment comment;
 
 
