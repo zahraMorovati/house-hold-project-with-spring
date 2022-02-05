@@ -1,6 +1,7 @@
 package ir.maktab.service;
 
 
+import ir.maktab.data.dto.SuggestionDto;
 import ir.maktab.data.entity.*;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -43,13 +44,13 @@ public class OrderServiceTests {
 
         Order order = orderService.findById(1);
         Specialist specialist = specialistService.findById(1);
-        suggestionService.addSpecialistSuggestion(order,specialist,200,3,new Date());
+        suggestionService.addSpecialistSuggestion(order.getOrderCode(),specialist.getEmail(),200,3,new Date());
     }
 
     @Test
     public void get_suggestions_list(){
         Order order = orderService.findById(1);
-        List<Suggestion> list = orderService.getOrderSuggestions(order);
+        List<SuggestionDto> list = suggestionService.findSuggestionByOrder(order.getOrderCode());
         Assertions.assertThat(list.size()).isGreaterThan(0);
     }
 
@@ -57,7 +58,7 @@ public class OrderServiceTests {
     public void select_Specialist(){
         Order order = orderService.findById(1);
         Suggestion suggestion = suggestionService.findById(1);
-        orderService.selectSpecialistSuggestion(order,suggestion);
+        orderService.selectSpecialistSuggestion(order.getOrderCode(),suggestion.getSuggestionCode());
     }
 
 
