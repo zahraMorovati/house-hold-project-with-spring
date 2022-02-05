@@ -1,0 +1,34 @@
+.right {
+  float: right;
+}
+
+.left {
+  float: left;
+}
+
+.rating .stars {
+  margin-right: 15px;
+}
+
+.rating .stars .star {
+  float: left;
+  padding: 5px 2px;
+  cursor: pointer;
+}
+
+.rating .stars .star:before {
+  font-family: 'FontAwesome', serif;
+  content: '\f005';
+  color: #d0e8f0;
+  font-size: 3em;
+}
+
+.rating .stars .star:hover:before,
+.rating .stars .star.to_rate:before,
+.rating .stars .star.rated:before {
+  color: #80c1d5;
+}
+
+.rating .stars .star.no_to_rate:before {
+  color: #d0e8f0;
+}
