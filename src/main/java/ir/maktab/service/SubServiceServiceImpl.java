@@ -4,8 +4,9 @@ package ir.maktab.service;
 import ir.maktab.data.dao.interfaces.SpecialistDao;
 import ir.maktab.data.dao.interfaces.SubServiceDao;
 import ir.maktab.data.dto.SubServiceDto;
+import ir.maktab.data.dto.SubServiceEntityDto;
+import ir.maktab.data.dto.mappers.SubServiceEntityMapper;
 import ir.maktab.data.dto.mappers.SubServiceMapper;
-import ir.maktab.data.dto.mappers.UserMapper;
 import ir.maktab.data.entity.Specialist;
 import ir.maktab.data.entity.SubService;
 import ir.maktab.exception.specialistExceptions.DuplicatedSpecialist;
@@ -14,14 +15,15 @@ import ir.maktab.exception.subServiceExceptions.DuplicatedSubServiceException;
 import ir.maktab.exception.subServiceExceptions.SubServiceNotFoundException;
 import ir.maktab.service.interfaces.SubServiceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 @RequiredArgsConstructor
 @Service
 public class SubServiceServiceImpl implements SubServiceService {
@@ -72,16 +74,13 @@ public class SubServiceServiceImpl implements SubServiceService {
     @Override
     public void addSpecialistToSubService(SubService subservice, Specialist specialist) {
 
-        //check subService existence
         subservice = subServiceDao.findById(subservice.getId()).orElse(null);
         if (subservice != null) {
 
-            //check specialist existence
             specialist = specialistDao.findSpecialistByEmail(specialist.getEmail()).get(0);
             if (specialist != null) {
                 int id = specialist.getId();
 
-                //check specialist is not duplicated
                 Optional<Specialist> duplicatedSpecialist = subservice.getSpecialists().stream().filter(i -> i.getId() == id).findAny();
                 if (duplicatedSpecialist.isPresent()) {
                     throw new DuplicatedSpecialist("this specialist already exist in this subService!");
@@ -90,54 +89,55 @@ public class SubServiceServiceImpl implements SubServiceService {
                     specialistList.add(specialist);
                     subServiceDao.save(subservice);
                 }
-            } else {
-                throw new SpecialistNotFoundException();
-            }
-        } else {
-            throw new SubServiceNotFoundException();
-        }
-
-
+            } else throw new SpecialistNotFoundException();
+        } else throw new SubServiceNotFoundException();
     }
 
     @Override
     public void removeSpecialistFromSubService(SubService subservice, Specialist specialist) {
 
-        //check subService existence
         subservice = subServiceDao.findById(subservice.getId()).orElse(null);
         if (subservice != null) {
 
-            //check specialist existence
             specialist = specialistDao.findSpecialistByEmail(specialist.getEmail()).get(0);
             if (specialist != null) {
                 int id = specialist.getId();
 
-                //check specialist is existing in subService list
                 Optional<Specialist> duplicatedSpecialist = subservice.getSpecialists().stream().filter(i -> i.getId() == id).findAny();
                 if (duplicatedSpecialist.isPresent()) {
                     List<Specialist> specialistList = subservice.getSpecialists();
                     specialistList.remove(specialist);
                     subServiceDao.save(subservice);
 
-                } else {
-                    throw new SpecialistNotFoundException("there is no specialist in this subService!");
-                }
-            } else {
-                throw new SpecialistNotFoundException();
-            }
-        } else {
-            throw new SubServiceNotFoundException();
-        }
+                } else throw new SpecialistNotFoundException("there is no specialist in this subService!");
+            } else throw new SpecialistNotFoundException();
+        } else throw new SubServiceNotFoundException();
 
     }
 
     @Override
     public List<SubServiceDto> getAllSubServices() {
         List<SubService> subServices = StreamSupport
-                .stream(subServiceDao.findAll().spliterator(),false)
+                .stream(subServiceDao.findAll().spliterator(), false)
                 .collect(Collectors.toList());
         return subServices.stream()
                 .map(SubServiceMapper::toSubServiceDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getSpecialistSubServices(String email) {
+        List<Specialist> specialists = specialistDao.findSpecialistByEmail(email);
+        if(!specialists.isEmpty()){
+            Specialist specialist = specialists.get(0);
+            return subServiceDao.findSubServiceNameBySpecialistId(specialist.getId());
+        }else throw new SpecialistNotFoundException();
+    }
+
+    @Override
+    public List<SubServiceEntityDto> findSubServiceByServiceName(String serviceName) {
+        List<SubService> subServices = new ArrayList<>(subServiceDao.findSubServiceByServiceName(serviceName));
+        return subServices.stream()
+                .map(SubServiceEntityMapper::toSubServiceEntityDto).collect(Collectors.toList());
     }
 
 

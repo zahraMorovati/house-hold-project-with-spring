@@ -1,6 +1,7 @@
 package ir.maktab.service.interfaces;
 
 import ir.maktab.data.dto.SubServiceDto;
+import ir.maktab.data.dto.SubServiceEntityDto;
 import ir.maktab.data.entity.Specialist;
 import ir.maktab.data.entity.SubService;
 
@@ -25,5 +26,10 @@ public interface SubServiceService {
     void removeSpecialistFromSubService(SubService subservice , Specialist specialist);
 
     List<SubServiceDto> getAllSubServices();
+
+    List<String> getSpecialistSubServices(String email);
+
+    List<SubServiceEntityDto> findSubServiceByServiceName(String serviceName);
+
 
 }
