@@ -77,5 +77,13 @@ public class ManagerServiceImpl implements ManagerService {
         } else throw new ManagerNotFoundException();
     }
 
+    @Override
+    public Manager findByEmail(String email) {
+        List<Manager> result = managerDao.findManagerByEmail(email);
+        if (result.size() >= 1) {
+            return result.get(0);
+        } else throw new ManagerNotFoundException();
+    }
+
 
 }
