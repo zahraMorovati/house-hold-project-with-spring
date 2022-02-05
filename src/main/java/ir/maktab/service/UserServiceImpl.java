@@ -9,7 +9,6 @@ import ir.maktab.data.enums.UserState;
 import ir.maktab.exception.UserEceptions.DuplicatedEmailException;
 import ir.maktab.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 @RequiredArgsConstructor
@@ -36,6 +35,7 @@ public class UserServiceImpl implements UserService {
         int result = customerDao.findCustomerByEmail(userDto.getEmail()).size();
         if (result <= 0) {
             Customer customer = getCustomer(userDto);
+            customer.setState(UserState.WAITING_FOR_CONFIRM);
             customerDao.save(customer);
         } else throw new DuplicatedEmailException();
     }
@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
         if (results <= 0) {
             Specialist specialist = getSpecialist(userDto);
             specialist.setImage(image.getBytes());
+            specialist.setState(UserState.WAITING_FOR_CONFIRM);
             specialistDao.save(specialist);
         } else throw new DuplicatedEmailException();
     }
