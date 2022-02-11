@@ -10,7 +10,7 @@ import ir.maktab.data.entity.Address;
 import ir.maktab.data.entity.Customer;
 import ir.maktab.data.entity.Order;
 import ir.maktab.data.entity.SubService;
-import ir.maktab.exception.UserEceptions.UserNotConfirmedException;
+import ir.maktab.data.validators.Validation;
 import ir.maktab.exception.customerExceptions.BalanceIsNotEnoughException;
 import ir.maktab.exception.orderExceptions.MaxReachedOrderNumberException;
 import ir.maktab.exception.suggestionExceptions.SuggestedPriceIsHigherThanBasePriceException;
@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,12 +46,12 @@ public class CustomerController {
     private ModelAndView getAddOrderModelAndView(String email) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("saveOrderPage");
-        Map<String, String> services = new HashMap<>();
+        Map<String, String> subServices = new HashMap<>();
         /*serviceService.getServiceNames().forEach(i -> services.put(i.getName(), i.getName()));*/
-        subServiceService.getAllSubServices().forEach(i -> services.put(i.getSubServiceName(), i.getSubServiceName()));
+        subServiceService.getAllSubServices().forEach(i -> subServices.put(i.getSubServiceName(), i.getSubServiceName()));
         OrderDto orderDto = OrderDto.builder().setCustomer(email).build();
         /*mav.addObject("services", services);*/
-        mav.addObject("subServices", services);
+        mav.addObject("subServices", subServices);
         mav.addObject("orderDto", orderDto);
         return mav;
     }
@@ -68,28 +67,30 @@ public class CustomerController {
     public ModelAndView saveCustomerOrder(@ModelAttribute(name = "orderDto") OrderDto orderDto,
                                           @RequestParam(value = "date", required = false) String startDate) throws ParseException {
         ModelAndView modelAndView = new ModelAndView();
-        try {
-            Date date = new SimpleDateFormat("yyyy-mm-dd").parse(startDate);
-            Customer customer = customerService.findByEmail(orderDto.getCustomer());
-            SubService subService = subServiceService.findByName(orderDto.getSubService());
-            Address address = new Address();
-            orderService.addCustomerOrder(customer, subService, orderDto.getSuggestedPrice(), orderDto.getExplanations(), address, date);
-            return UserController.getCustomerAccountModelAndView(modelAndView, customer, orderService);
+        String errors = Validation.onOrderDto(orderDto);
+        if(errors.equals("")){
+            try {
+                Date date = new SimpleDateFormat("yyyy-mm-dd").parse(startDate);
+                Customer customer = customerService.findByEmail(orderDto.getCustomer());
+                SubService subService = subServiceService.findByName(orderDto.getSubService());
+                Address address = new Address();
+                orderService.addCustomerOrder(customer, subService, orderDto.getSuggestedPrice(), orderDto.getExplanations(), address, date);
+                return UserController.getCustomerAccountModelAndView(modelAndView, customer, orderService);
 
-        } catch (SuggestedPriceIsHigherThanBasePriceException basePriceException) {
-            modelAndView = getAddOrderModelAndView(orderDto.getCustomer());
-            modelAndView.addObject("errorSuggestedPrice", "suggested price is more than base price!");
-            return modelAndView;
-        } catch (MaxReachedOrderNumberException maxReachedOrderNumberException) {
-            modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customerService.findByEmail(orderDto.getCustomer()), orderService);
-            modelAndView.addObject("errorMaxReachedOrderNumber", "you have too many unfinished orders!");
-            return modelAndView;
-        } catch (UserNotConfirmedException userNotConfirmedException) {
-            modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customerService.findByEmail(orderDto.getCustomer()), orderService);
-            modelAndView.addObject("errorUserNotConfirmed", "you're not confirmed yet!");
-            return modelAndView;
+            } catch (SuggestedPriceIsHigherThanBasePriceException basePriceException) {
+                modelAndView = getAddOrderModelAndView(orderDto.getCustomer());
+                modelAndView.addObject("errorSuggestedPrice", "suggested price is more than base price!");
+                return modelAndView;
+            } catch (MaxReachedOrderNumberException maxReachedOrderNumberException) {
+                modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customerService.findByEmail(orderDto.getCustomer()), orderService);
+                modelAndView.addObject("errorMaxReachedOrderNumber", "you have too many unfinished orders!");
+                return modelAndView;
+            }
+        }else {
+           ModelAndView mav = getAddOrderModelAndView(orderDto.getCustomer());
+            mav.addObject("saveOrderErrors",errors);
+            return mav;
         }
-
 
     }
 
@@ -166,20 +167,20 @@ public class CustomerController {
     public ModelAndView saveComment(@ModelAttribute("commentDto") CommentDto commentDto,
                                     @RequestParam("orderCode") String orderCode,
                                     @RequestParam("email") String email,
-                                    @RequestParam("rating")int point) {
+                                    @RequestParam("rating") int point) {
         commentDto.setPoint(point);
         Order order = orderService.findByOrderCode(orderCode);
         order.setComment(CommentMapper.toComment(commentDto));
         orderService.save(order);
         Customer customer = customerService.findByEmail(email);
-        return UserController.getCustomerAccountModelAndView(new ModelAndView(),customer,orderService);
+        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService);
     }
 
     @GetMapping("/timeout")
-    public ModelAndView dashbord(@RequestParam("email") String email){
+    public ModelAndView dashbord(@RequestParam("email") String email) {
         System.out.println(email);
         Customer customer = customerService.findByEmail(email);
-        return UserController.getCustomerAccountModelAndView(new ModelAndView(),customer,orderService);
+        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService);
     }
 
 
