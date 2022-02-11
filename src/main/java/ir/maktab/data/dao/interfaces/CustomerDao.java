@@ -2,6 +2,7 @@ package ir.maktab.data.dao.interfaces;
 
 
 import ir.maktab.data.entity.Customer;
+import ir.maktab.data.enums.UserState;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,12 +22,26 @@ import java.util.List;
 public interface CustomerDao extends PagingAndSortingRepository<Customer, Integer>, JpaSpecificationExecutor<Customer> {
 
 
-    static Specification<Customer> filterCustomers(String name, String family, String email) {
+    static Specification<Customer> filterNotConfirmedCustomers(String name, String family, String email) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             Predicate condition1 = criteriaBuilder.like(root.get("name"), name);
             Predicate condition2 = criteriaBuilder.like(root.get("family"), family);
             Predicate condition3 = criteriaBuilder.like(root.get("email"), email);
-            return criteriaBuilder.or(condition1, condition2, condition3);
+            Predicate conditionState = criteriaBuilder.equal(root.get("state"), UserState.WAITING_FOR_CONFIRM);
+            return criteriaBuilder.or(condition1, condition2, condition3,conditionState);
+        };
+    }
+
+    static Specification<Customer> filterCustomersByUserState(UserState userState) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            CriteriaQuery<Customer> resultCriteria = criteriaBuilder.createQuery(Customer.class);
+            List<Predicate> filterPredicates = new ArrayList<>();
+
+            if (userState != null) {
+                filterPredicates.add(criteriaBuilder.equal(root.get("state"), userState));
+            }
+            resultCriteria.select(root).where(filterPredicates.toArray(new Predicate[0]));
+            return resultCriteria.getRestriction();
         };
     }
 
@@ -68,8 +83,7 @@ public interface CustomerDao extends PagingAndSortingRepository<Customer, Intege
     @Query(value = "update Customer c set c.password=:newPassword where c.email=:email")
     void updatePasswordByEmail(@Param("newPassword") String newPassword, @Param("email") String email);
 
-    //todo use criteria
-    List<Customer> findCustomerByNameOrFamilyOrEmail(String name, String family, String email);
-
     List<Customer> findCustomerByEmailAndPassword(String email, String password);
+
+
 }
