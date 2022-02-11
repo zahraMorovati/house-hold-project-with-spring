@@ -16,8 +16,6 @@ import ir.maktab.exception.suggestionExceptions.SuggestionNotFoundException;
 import ir.maktab.service.interfaces.SuggestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,27 +39,23 @@ public class SuggestionServiceImpl implements SuggestionService {
     public void addSpecialistSuggestion(String orderCode, String specialistEmail, double suggestedPrice,
                                         double workHour, Date startTime) {
 
-        List<Order> optionalOrder = orderDao.findOrderByOrderCode(orderCode);
-        if (optionalOrder.size()>=1) {
-
-            List<Specialist> optionalSpecialist = specialistDao.findSpecialistByEmail(specialistEmail);
-            if (optionalSpecialist.size()>=1) {
-
+        List<Specialist> optionalSpecialist = specialistDao.findSpecialistByEmail(specialistEmail);
+        if (!optionalSpecialist.isEmpty()) {
+            List<Order> optionalOrder = orderDao.findOrderByOrderCode(orderCode);
+            if (!optionalOrder.isEmpty()) {
                 Order order = optionalOrder.get(0);
-                Specialist specialist = optionalSpecialist.get(0);
-
                 if (suggestedPrice < order.getSubService().getPrice()) {
-                    Suggestion suggestion = getSuggestion(specialist,suggestedPrice, workHour, startTime, order);
 
+                    Specialist specialist = optionalSpecialist.get(0);
+                    Suggestion suggestion = getSuggestion(specialist,suggestedPrice, workHour, startTime, order);
                     order.setOrderState(OrderState.WAITING_FOR_SPECIALIST_SELECTION);
                     orderDao.save(order);
-
                     suggestion.setSuggestionCode(getRandomCode(suggestionDao));
                     suggestionDao.save(suggestion);
 
                 } else throw new SuggestedPriceIsHigherThanBasePriceException();
-            } else throw new SpecialistNotFoundException();
-        } else throw new OrderNotFoundException();
+            } else throw new OrderNotFoundException();
+        } else throw new SpecialistNotFoundException();
     }
 
     @Override
@@ -75,7 +69,7 @@ public class SuggestionServiceImpl implements SuggestionService {
     @Override
     public List<SuggestionDto> findSuggestionByOrder(String orderCode) {
         List<Order> resultOrders = orderDao.findOrderByOrderCode(orderCode);
-        if(resultOrders.size()>=1){
+        if(!resultOrders.isEmpty()){
             Order order = resultOrders.get(0);
             List<Suggestion> suggestions = suggestionDao.findSuggestionByOrderAndSpecialist(order.getId());
             return suggestions
