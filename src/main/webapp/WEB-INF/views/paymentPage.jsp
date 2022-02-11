@@ -39,7 +39,7 @@
                 </div>
                 <div class="col-6">
                     <div class="d-flex flex-column">
-                        <p class="text mb-1">Expiry</p> <input class="form-control mb-3" type="text" placeholder="MM/YYYY">
+                        <p class="text mb-1">Expiry</p> <input class="form-control mb-3" type="date" placeholder="MM/YYYY">
                     </div>
                 </div>
                 <div class="col-6">

@@ -28,7 +28,7 @@
 <div class="container">
     <form:form action="/customer/saveComment?orderCode=${orderCode}&email=${email}" method="post" modelAttribute="commentDto">
         <h3>Rate!</h3>
-        <div class="rating left">
+        <%--<div class="rating left">
             <div class="stars right">
                 <a class="star rated"></a>
                 <a class="star rated"></a>
@@ -36,7 +36,8 @@
                 <a class="star"></a>
                 <a class="star"></a>
             </div>
-        </div>
+        </div>--%>
+        <form:input path="point"/> <br/>
         <form:input path="comment" type="text" placeholder="enter your comment ..."/>
         <br/>
         <input value="save" type="submit">

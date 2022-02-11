@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -28,11 +27,14 @@
 <div class="container">
 
     <div class="center">
-        <div style="background-color: white; height: 650px; width: 500px; border-radius: 5%;" >
+        <div style="background-color: white; height: 600px; width: 500px; border-radius: 5%;" id="mainDiv">
             <div class=" p-5 justify-content-center m-4">
                 <h4 class="text-center" style="margin-bottom: 30px; font-size: 30px" >Sign up</h4>
                 <p class="text-danger">${error}</p>
-                <form:form modelAttribute="userDto" action="/signup" method="post" enctype="multipart/form-data">
+                <p class="text-danger">${emailNotValid}</p>
+                <p class="text-danger" id="signupErrors">${signupErrors}</p>
+
+                <form:form modelAttribute="userDto" action="/doSignup" method="post" enctype="multipart/form-data">
                     <table border="0" cellpadding="5">
                         <tr>
                             <td>name:</td>
@@ -62,8 +64,8 @@
                             </td>
                             <td>
                                 <form:select path="userType" id="userType" onchange="updateDropDownList()" cssClass="space btn btn-light dropdown-toggle">
-                                    <form:option value="CUSTOMER" label="customer" cssClass="dropdown-item"/>
                                     <form:option value="SPECIALIST" label="specialist" cssClass="dropdown-item"/>
+                                    <form:option value="CUSTOMER" label="customer" cssClass="dropdown-item"/>
                                 </form:select>
                             </td>
 
@@ -82,7 +84,7 @@
                         </tr>
 
                         <tr>
-                            <td colspan="2"><input type="submit" value="sign up" class="btn btn-style button_style"><td/>
+                            <td colspan="2"><input type="submit" value="sign up" class="btn btn-style button_style" id="button"><td/>
                         </tr>
 
                     </table>
@@ -109,9 +111,23 @@
         const option = select.options[select.selectedIndex];
 
         if(option.value === "CUSTOMER"){
+
             document.getElementById('imageSection').style.visibility="hidden";
+            document.getElementById("signupErrors").innerText="";
+            document.getElementById('mainDiv').style.height="550px";
+            document.getElementById('button').style.marginTop="-50px";
         }else {
             document.getElementById('imageSection').style.visibility = 'visible';
+            document.getElementById('mainDiv').style.height="650px";
+            document.getElementById('button').style.marginTop="50px";
+            document.getElementById("signupErrors").innerText="";
+        }
+    }
+
+    window.onload = function () {
+        const errors = document.getElementById("signupErrors").innerText;
+        if(errors.length>0){
+            document.getElementById('mainDiv').style.height="720px";
         }
     }
 

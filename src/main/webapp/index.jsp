@@ -49,8 +49,9 @@
         </div>
         <div class="u-custom-menu u-nav-container">
             <ul class="u-nav u-unstyled u-nav-1"><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-3-base u-text-hover-palette-2-base u-text-palette-5-dark-3" href="/" style="padding: 10px 20px;">Home</a>
-            </li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-3-base u-text-hover-palette-2-base u-text-palette-5-dark-3" href="/newUser" style="padding: 10px 20px;">sign up</a>
+            </li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-3-base u-text-hover-palette-2-base u-text-palette-5-dark-3" href="/signup" style="padding: 10px 20px;">sign up</a>
             </li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-3-base u-text-hover-palette-2-base u-text-palette-5-dark-3" href="/signIn" style="padding: 10px 20px;">login</a>
+            </li><li class="u-nav-item"><a class="u-button-style u-nav-link u-text-active-palette-3-base u-text-hover-palette-2-base u-text-palette-5-dark-3" href="/loadService" style="padding: 10px 20px;">test</a>
             </li></ul>
         </div>
         <div class="u-custom-menu u-nav-container-collapse">

@@ -11,8 +11,8 @@ ${userDto.family}<br/><br/>
 ${userDto.email}<br/><br/>
 <a href="/manager/newService?email=${userDto.email}">add service</a><br/><br/>
 <a href="/manager/newSubService?email=${userDto.email}">add subservice</a><br/><br/>
-<a href="/manager/listSpecialist?mEmail=${userDto.email}&name=&family=&email=">list specialists</a><br/><br/>
-<a href="/manager/listCustomer?mEmail=${userDto.email}&name=&family=&email=">list customers</a>
+<a href="/manager/listSpecialist?mEmail=${userDto.email}&name=&family=&email=">confirm specialists</a><br/><br/>
+<a href="/manager/listCustomer?mEmail=${userDto.email}&name=&family=&email=">confirm customers</a>
 
 </body>
 </html>

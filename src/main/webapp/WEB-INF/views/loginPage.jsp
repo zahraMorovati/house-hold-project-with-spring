@@ -1,4 +1,5 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -25,11 +26,12 @@
 <div class="container">
 
     <div class="center">
-        <div style="background-color: white; height: 450px; width: 500px; border-radius: 5%;" >
+        <div style="background-color: white; height: 500px; width: 500px; border-radius: 5%;" >
 
             <div class=" p-5 justify-content-center m-4">
                 <h4 class="text-center" style="margin-bottom: 30px; font-size: 30px" >login</h4>
                 <p class="text-danger">${error}</p>
+                <p class="text-danger">${UserNotConfirmed}</p>
                 <form:form action="/login" method="post" >
                     <table border="0" cellpadding="5">
                         <tr>

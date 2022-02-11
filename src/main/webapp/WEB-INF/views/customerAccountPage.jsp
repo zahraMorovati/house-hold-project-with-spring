@@ -27,7 +27,7 @@
         <table border="0" cellpadding="5" >
             <tr>
                 <td>Name: </td>
-                <td>${userDto.name}</td>
+                <td>${userDto.name} ${testSession}</td>
             </tr>
             <tr>
                 <td>family: </td>

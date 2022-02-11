@@ -28,6 +28,7 @@
     <form:form action="/customer/saveOrder" method="post" modelAttribute="orderDto">
         <table border="0" cellpadding="5">
             <p class="text-danger">${errorSuggestedPrice}</p>
+            <p class="text-danger">${saveOrderErrors}</p>
             <tr hidden>
                 <td>${orderDto.customer}
                     <form:hidden path="customer"/>
@@ -74,6 +75,7 @@
         </table>
     </form:form>
 </div>
+
 <script
         src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
