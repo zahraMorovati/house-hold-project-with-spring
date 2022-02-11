@@ -5,12 +5,12 @@ import ir.maktab.data.dao.interfaces.SpecialistDao;
 import ir.maktab.data.dto.CustomerDto;
 import ir.maktab.data.dto.mappers.CustomerMapper;
 import ir.maktab.data.entity.Customer;
-import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.entity.User;
+import ir.maktab.data.enums.UserState;
+import ir.maktab.exception.UserEceptions.UserNotConfirmedException;
 import ir.maktab.exception.UserEceptions.WrongEmailException;
-import ir.maktab.exception.customerExceptions.BalanceIsNotEnoughException;
 import ir.maktab.exception.customerExceptions.CannotSaveCustomerException;
 import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
-import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.interfaces.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -23,8 +23,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-
-import static ir.maktab.util.Convert.parsDate;
+import static ir.maktab.util.Convert.toDate;
+import static ir.maktab.util.SendEmail.sendEmail;
 
 @RequiredArgsConstructor
 @Service
@@ -52,8 +52,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void delete(Customer customer) {
-        customerDao.delete(customer);
+    public void delete(String email) {
+        List<Customer> result = customerDao.findCustomerByEmail(email);
+        if (!result.isEmpty()) {
+            Customer customer = result.get(0);
+            customerDao.delete(customer);
+        } else throw new CustomerNotFoundException();
     }
 
     @Override
@@ -93,14 +97,17 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer findByEmailAndPassword(String email, String password) {
         List<Customer> result = customerDao.findCustomerByEmailAndPassword(email, password);
         if (result.size() >= 1) {
-            return result.get(0);
+            Customer customer = result.get(0);
+            if(customer.getState().equals( UserState.CONFIRMED)){
+               return customer;
+            }else throw new UserNotConfirmedException();
         } else throw new CustomerNotFoundException();
     }
 
     @Override
-    public List<CustomerDto> filterCustomers(String name, String family, String email) {
+    public List<CustomerDto> filterNotConfirmedCustomers(String name, String family, String email) {
 
-        Specification<Customer> specification = CustomerDao.filterCustomers(name, family, email);
+        Specification<Customer> specification = CustomerDao.filterNotConfirmedCustomers(name, family, email);
         return customerDao.findAll(specification).stream()
                 .map(CustomerMapper::toCustomerDto).collect(Collectors.toList());
     }
@@ -108,18 +115,45 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<CustomerDto> advancedFilterCustomers(String name, String family, String email, String startingRegistrationDate, String endingRegistrationDate, Integer minOrderNumber, Integer maxOrderNumber) {
 
-        Date startingDate = parsDate(startingRegistrationDate);
-        Date endingDate = parsDate(startingRegistrationDate);
+        Date startingDate = toDate(startingRegistrationDate);
+        Date endingDate = toDate(startingRegistrationDate);
         int minNumber = 0;
         int maxNumber = 0;
         if (minOrderNumber != null) minNumber = minOrderNumber;
         if (maxOrderNumber != null) maxNumber = maxOrderNumber;
-        Specification<Customer> specification = CustomerDao.advancedFilter(name,family,email,startingDate,endingDate,minNumber,maxNumber);
+        Specification<Customer> specification = CustomerDao.advancedFilter(name, family, email, startingDate, endingDate, minNumber, maxNumber);
         return customerDao.findAll(specification).stream()
                 .map(CustomerMapper::toCustomerDto).collect(Collectors.toList());
     }
 
+    @Override
+    public void confirmCustomer(String email) {
+        List<Customer> customerResult = customerDao.findCustomerByEmail(email);
+        if (!customerResult.isEmpty()) {
+            Customer customer = customerResult.get(0);
+            customer.setState(UserState.CONFIRMED);
+            customerDao.save(customer);
+            String emailText = "hello dear " + customer.getName() + " " + customer.getFamily() + " we confirmed your account you can check betterHouse.com.";
+            sendEmail(customer.getEmail(), "Better House", emailText);
+        } else throw new CustomerNotFoundException();
+    }
 
+    @Override
+    public List<CustomerDto> getAllNotConfirmedCustomers() {
+        Specification<Customer> specification = CustomerDao.filterCustomersByUserState(UserState.WAITING_FOR_CONFIRM);
+        return customerDao.findAll(specification).stream()
+                .map(CustomerMapper::toCustomerDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateCustomerState(UserState userState, String email) {
+        List<Customer> result = customerDao.findCustomerByEmail(email);
+        if (!result.isEmpty()) {
+            Customer customer = result.get(0);
+            customer.setState(userState);
+            customerDao.save(customer);
+        } else throw new WrongEmailException();
+    }
 
 
 }
