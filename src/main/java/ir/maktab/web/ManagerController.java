@@ -1,17 +1,16 @@
 package ir.maktab.web;
 
-import com.google.gson.Gson;
 import ir.maktab.data.dto.*;
-import ir.maktab.data.entity.*;
-import ir.maktab.data.enums.UserState;
+import ir.maktab.data.entity.Manager;
+import ir.maktab.data.entity.Service;
+import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.entity.SubService;
 import ir.maktab.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +38,9 @@ public class ManagerController {
     private ModelAndView getModelAndViewListCustomer(String name, String family, String email, String managerEmail) {
         List<CustomerDto> result;
         if (name.isEmpty() && family.isEmpty() && email.isEmpty()) {
-            result = customerService.getAllCustomers();
+            result = customerService.getAllNotConfirmedCustomers();
         } else {
-            result = customerService.filterCustomers(name, email, family);
+            result = customerService.filterNotConfirmedCustomers(name, email, family);
         }
         ModelAndView mav = new ModelAndView("listCustomersPage");
         mav.addObject("listCustomers", result);
@@ -60,6 +59,7 @@ public class ManagerController {
     @RequestMapping(value = "/saveService", method = RequestMethod.POST)
     public ModelAndView saveService(@ModelAttribute("newServiceObject") ServiceDto serviceDto,
                                     @RequestParam String email) {
+
         Manager manager = managerService.findByEmail(email);
         serviceService.save(serviceDto);
         return UserController.getManagerModelAndView(new ModelAndView(), manager);
@@ -76,9 +76,9 @@ public class ManagerController {
     private ModelAndView getListSpecialistsModelAndView(String name, String family, String email, String managerEmail) {
         List<SpecialistDto> result;
         if (name.isEmpty() && family.isEmpty() && email.isEmpty()) {
-            result = specialistService.getAllSpecialists();
+            result = specialistService.getAllNotConfirmedSpecialist();
         } else {
-            result = specialistService.filterSpecialists(name, email, family);
+            result = specialistService.filterNotConfirmedSpecialists(name, email, family);
         }
         ModelAndView mav = new ModelAndView("listSpecialistPage");
         mav.addObject("listSpecialists", result);
@@ -88,15 +88,13 @@ public class ManagerController {
 
     @RequestMapping("/addToSubService")
     public ModelAndView addSpecialistToSubService(@RequestParam String email) {
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("listSubServicesPage");
-
         UserDto specialist = UserDto.builder().setEmail(email).build();
         mav.addObject("specialist", specialist);
-
         List<SubServiceDto> subServiceDtoList = subServiceService.getAllSubServices();
         mav.addObject("subServiceDtoList", subServiceDtoList);
-
         return mav;
     }
 
@@ -115,12 +113,10 @@ public class ManagerController {
 
         SubServiceDto subServiceDto = new SubServiceDto();
         model.put("newSubServiceObject", subServiceDto);
-
         Map<String, String> serviceList = new HashMap<>();
         serviceService.getServiceNames().forEach(i -> serviceList.put(i.getName(), i.getName()));
         model.put("services", serviceList);
         model.put("email", email);
-
         return "saveSubServicePage";
     }
 
@@ -140,9 +136,7 @@ public class ManagerController {
                                              @RequestParam("m") String managerEmail) {
         ModelAndView mav = new ModelAndView();
         try {
-            Customer customer = customerService.findByEmail(customerEmail);
-            customer.setState(UserState.CONFIRMED);
-            customerService.update(customer);
+            customerService.confirmCustomer(customerEmail);
             mav = getModelAndViewListCustomer("", "", "", managerEmail);
             mav.addObject("success", "user successfully confirmed!");
             return mav;
@@ -160,9 +154,7 @@ public class ManagerController {
                                                @RequestParam("m") String managerEmail) {
         ModelAndView mav = new ModelAndView();
         try {
-            Specialist specialist = specialistService.findByEmail(specialistEmail);
-            specialist.setState(UserState.CONFIRMED);
-            specialistService.update(specialist);
+            specialistService.confirmSpecialist(specialistEmail);
             mav = getListSpecialistsModelAndView("", "", "", managerEmail);
             mav.addObject("success", "user successfully confirmed!");
             return mav;
@@ -173,9 +165,6 @@ public class ManagerController {
             return mav;
         }
     }
-
-
-
 
 
 }

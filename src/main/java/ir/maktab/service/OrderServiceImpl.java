@@ -5,8 +5,6 @@ import ir.maktab.data.dto.OrderDto;
 import ir.maktab.data.dto.mappers.OrderMapper;
 import ir.maktab.data.entity.*;
 import ir.maktab.data.enums.OrderState;
-import ir.maktab.data.enums.UserState;
-import ir.maktab.exception.UserEceptions.UserNotConfirmedException;
 import ir.maktab.exception.customerExceptions.BalanceIsNotEnoughException;
 import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
 import ir.maktab.exception.orderExceptions.CannotSaveOrderException;
@@ -28,7 +26,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static ir.maktab.util.Convert.parsDate;
+import static ir.maktab.util.Convert.toDate;
 import static ir.maktab.util.Convert.toOrderState;
 
 @RequiredArgsConstructor
@@ -88,22 +86,20 @@ public class OrderServiceImpl implements OrderService {
         Optional<Customer> optionalCustomer = customerDao.findById(customer.getId());
         if (optionalCustomer.isPresent()) {
             customer = optionalCustomer.get();
-            if (customer.getState().equals(UserState.CONFIRMED)) {
-                int customerUnfinishedOrders = orderDao.findOrderByCustomer_Email(customer.getEmail()).stream().map(i -> i.getOrderState() != OrderState.DONE).collect(Collectors.toList()).size();
-                if (customerUnfinishedOrders < customerMaxOrders) {
-                    Optional<SubService> optionalSubService = subServiceDao.findById(subService.getId());
-                    if (optionalSubService.isPresent()) {
-                        if (subService.getPrice() > suggestedPrice) {
+            int customerUnfinishedOrders = orderDao.findOrderByCustomer_Email(customer.getEmail()).stream().filter(i -> !(i.getOrderState().equals(OrderState.PAID))).collect(Collectors.toList()).size();
+            if (customerUnfinishedOrders < customerMaxOrders) {
+                Optional<SubService> optionalSubService = subServiceDao.findById(subService.getId());
+                if (optionalSubService.isPresent()) {
+                    if (subService.getPrice() > suggestedPrice) {
 
-                            subService = optionalSubService.get();
-                            String code = getRandomCode(orderDao);
-                            Order order = getOrder(customer, subService, suggestedPrice, explanations, address, startDate, code);
-                            orderDao.save(order);
+                        subService = optionalSubService.get();
+                        String code = getRandomCode(orderDao);
+                        Order order = getOrder(customer, subService, suggestedPrice, explanations, address, startDate, code);
+                        orderDao.save(order);
 
-                        } else throw new SuggestedPriceIsHigherThanBasePriceException();
-                    } else throw new SubServiceNotFoundException();
-                } else throw new MaxReachedOrderNumberException();
-            } else throw new UserNotConfirmedException();
+                    } else throw new SuggestedPriceIsHigherThanBasePriceException();
+                } else throw new SubServiceNotFoundException();
+            } else throw new MaxReachedOrderNumberException();
         } else throw new CustomerNotFoundException();
     }
 
@@ -226,8 +222,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> orderAdvancedFilter(String startDate, String endDate, String orderState, String serviceName, String subServiceName) {
-        Date orderStartDate = parsDate(startDate);
-        Date orderEndDate = parsDate(endDate);
+        Date orderStartDate = toDate(startDate);
+        Date orderEndDate = toDate(endDate);
         Specification<Order> specification = OrderDao.filterOrders(orderStartDate, orderEndDate, toOrderState(orderState), serviceName, subServiceName);
         return orderDao.findAll(specification).stream()
                 .map(OrderMapper::toOrderDto).collect(Collectors.toList());
