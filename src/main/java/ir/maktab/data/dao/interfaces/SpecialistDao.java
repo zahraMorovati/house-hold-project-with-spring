@@ -1,6 +1,7 @@
 package ir.maktab.data.dao.interfaces;
 
 import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.enums.UserState;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -41,12 +42,13 @@ public interface SpecialistDao extends PagingAndSortingRepository<Specialist, In
 
     List<Specialist> findSpecialistByEmailAndPassword(String email, String password);
 
-    static Specification<Specialist> filterSpecialists(String name, String family, String email) {
+    static Specification<Specialist> filterNotConfirmedSpecialists(String name, String family, String email) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             Predicate condition1 = criteriaBuilder.like(root.get("name"), name);
             Predicate condition2 = criteriaBuilder.like(root.get("family"), family);
             Predicate condition3 = criteriaBuilder.like(root.get("email"), email);
-            return criteriaBuilder.or(condition1, condition2, condition3);
+            Predicate conditionState = criteriaBuilder.equal(root.get("state"), UserState.WAITING_FOR_CONFIRM);
+            return criteriaBuilder.or(condition1, condition2, condition3, conditionState);
         };
     }
 
@@ -70,6 +72,18 @@ public interface SpecialistDao extends PagingAndSortingRepository<Specialist, In
                 filterPredicates.add(criteriaBuilder.between(root.get("RegistrationDate"), startingRegistrationDate, endingRegistrationDate));
             } else if (maxOrderNumber > 1 && minOrderNumber >= 0) {
                 filterPredicates.add(criteriaBuilder.between(criteriaBuilder.size(root.get("orders")), minOrderNumber, maxOrderNumber));
+            }
+            resultCriteria.select(root).where(filterPredicates.toArray(new Predicate[0]));
+            return resultCriteria.getRestriction();
+        };
+    }
+
+    static Specification<Specialist> filterSpecialistsByUserState(UserState userState) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            CriteriaQuery<Specialist> resultCriteria = criteriaBuilder.createQuery(Specialist.class);
+            List<Predicate> filterPredicates = new ArrayList<>();
+            if (userState != null) {
+                filterPredicates.add(criteriaBuilder.equal(root.get("state"), userState));
             }
             resultCriteria.select(root).where(filterPredicates.toArray(new Predicate[0]));
             return resultCriteria.getRestriction();

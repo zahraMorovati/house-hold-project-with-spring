@@ -3,8 +3,12 @@ package ir.maktab.service;
 import ir.maktab.data.dao.interfaces.SpecialistDao;
 import ir.maktab.data.dto.SpecialistDto;
 import ir.maktab.data.dto.mappers.SpecialistMapper;
+import ir.maktab.data.entity.Customer;
 import ir.maktab.data.entity.Specialist;
+import ir.maktab.data.enums.UserState;
+import ir.maktab.exception.UserEceptions.UserNotConfirmedException;
 import ir.maktab.exception.UserEceptions.WrongEmailException;
+import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
 import ir.maktab.exception.specialistExceptions.CannotSaveSpecialistException;
 import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.interfaces.SpecialistService;
@@ -15,15 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static ir.maktab.util.Convert.parsDate;
+import static ir.maktab.util.Convert.toDate;
+import static ir.maktab.util.SendEmail.sendEmail;
 
 @RequiredArgsConstructor
 @Service
@@ -38,8 +41,12 @@ public class SpecialistServiceImpl implements SpecialistService {
     }
 
     @Override
-    public void delete(Specialist specialist) {
-        specialistDao.delete(specialist);
+    public void delete(String email) {
+        List<Specialist> result = specialistDao.findSpecialistByEmail(email);
+        if (!result.isEmpty()) {
+            Specialist specialist = result.get(0);
+            specialistDao.delete(specialist);
+        } else throw new SpecialistNotFoundException();
     }
 
     @Override
@@ -90,22 +97,25 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Override
     public Specialist findByEmailAndPassword(String email, String password) {
         List<Specialist> result = specialistDao.findSpecialistByEmailAndPassword(email, password);
-        if (result.size() >= 1) {
-            return result.get(0);
+        if (!result.isEmpty()) {
+            Specialist specialist = result.get(0);
+            if (specialist.getState().equals(UserState.CONFIRMED)) {
+                return specialist;
+            } else throw new UserNotConfirmedException();
         } else throw new SpecialistNotFoundException();
     }
 
     @Override
-    public List<SpecialistDto> filterSpecialists(String name, String family, String email) {
-        Specification<Specialist> specification = SpecialistDao.filterSpecialists(name, family, email);
+    public List<SpecialistDto> filterNotConfirmedSpecialists(String name, String family, String email) {
+        Specification<Specialist> specification = SpecialistDao.filterNotConfirmedSpecialists(name, family, email);
         return specialistDao.findAll(specification).stream().map(SpecialistMapper::toSpecialistDto).collect(Collectors.toList());
     }
 
     @Override
     public List<SpecialistDto> advancedFilterSpecialists(String name, String family, String email, String startingRegistrationDate, String endingRegistrationDate, Integer minOrderNumber, Integer maxOrderNumber) {
 
-        Date startingDate = parsDate(startingRegistrationDate);
-        Date endingDate = parsDate(startingRegistrationDate);
+        Date startingDate = toDate(startingRegistrationDate);
+        Date endingDate = toDate(startingRegistrationDate);
 
         int minNumber = 0;
         int maxNumber = 0;
@@ -116,7 +126,33 @@ public class SpecialistServiceImpl implements SpecialistService {
         return specialistDao.findAll(specification).stream().map(SpecialistMapper::toSpecialistDto).collect(Collectors.toList());
     }
 
+    @Override
+    public void confirmSpecialist(String email) {
+        List<Specialist> specialistResult = specialistDao.findSpecialistByEmail(email);
+        if (!specialistResult.isEmpty()) {
+            Specialist specialist = specialistResult.get(0);
+            specialist.setState(UserState.CONFIRMED);
+            specialistDao.save(specialist);
+            String emailText = "hello dear " + specialist.getName() + " " + specialist.getFamily() + " we confirmed your account you can check betterHouse.com for more details.";
+            sendEmail(specialist.getEmail(), "Better House", emailText);
+        } else throw new CustomerNotFoundException();
+    }
 
+    @Override
+    public List<SpecialistDto> getAllNotConfirmedSpecialist() {
+        Specification<Specialist> specification = SpecialistDao.filterSpecialistsByUserState(UserState.WAITING_FOR_CONFIRM);
+        return specialistDao.findAll(specification).stream().map(SpecialistMapper::toSpecialistDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateSpecialistState(UserState userState, String email) {
+        List<Specialist> result = specialistDao.findSpecialistByEmail(email);
+        if (!result.isEmpty()) {
+            Specialist specialist = result.get(0);
+            specialist.setState(userState);
+            specialistDao.save(specialist);
+        } else throw new WrongEmailException();
+    }
 
 
 }
