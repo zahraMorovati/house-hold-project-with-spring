@@ -1,27 +1,37 @@
 package ir.maktab.web;
 
+import ir.maktab.config.LastViewInterceptor;
 import ir.maktab.data.dto.OrderDto;
-import ir.maktab.data.dto.SubServiceDto;
 import ir.maktab.data.dto.UserDto;
 import ir.maktab.data.dto.mappers.UserMapper;
 import ir.maktab.data.entity.Customer;
 import ir.maktab.data.entity.Manager;
-import ir.maktab.data.entity.Order;
 import ir.maktab.data.entity.Specialist;
 import ir.maktab.data.enums.OrderState;
+import ir.maktab.data.enums.UserState;
+import ir.maktab.data.validators.Validation;
 import ir.maktab.exception.UserEceptions.DuplicatedEmailException;
+import ir.maktab.exception.UserEceptions.UserNotConfirmedException;
 import ir.maktab.exception.customerExceptions.CustomerNotFoundException;
 import ir.maktab.exception.managerExceptions.ManagerNotFoundException;
 import ir.maktab.exception.specialistExceptions.SpecialistNotFoundException;
 import ir.maktab.service.*;
+import ir.maktab.util.Convert;
+import ir.maktab.util.SendEmail;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Controller
@@ -34,19 +44,63 @@ public class UserController {
     private final OrderServiceImpl orderService;
     private final SubServiceServiceImpl subServiceService;
 
-    @RequestMapping("/newUser")
+    @RequestMapping("/signup")
     public String newUser(Map<String, Object> model) {
         UserDto userDto = new UserDto();
         model.put("userDto", userDto);
         return "signup";
     }
 
-    @PostMapping(value = "/signup")
+    @RequestMapping(value = "/doSignup")
     public ModelAndView register(@ModelAttribute("userDto") UserDto userDto,
-                                 @RequestParam("image") CommonsMultipartFile image) {
+                                 @RequestParam(value = "image",required = false) CommonsMultipartFile image) {
 
-        userService.saveUserByType(userDto, image);
-        return userLogin();
+        ModelAndView modelAndView = new ModelAndView();
+        String errors = Validation.onRegister(userDto);
+        if(errors.equals("")){
+            String verificationCode = getRandomCode();
+            SendEmail.sendEmail(userDto.getEmail(),"betterHouse email verification","your verify code is: "+verificationCode);
+            modelAndView.setViewName("confirmEmailPage");
+            modelAndView.addObject("verificationCode", Convert.toHexString(verificationCode));
+            modelAndView.addObject("email",userDto.getEmail());
+            modelAndView.addObject("userType",userDto.getUserType());
+            userService.saveUserByType(userDto, userDto.getImage());
+            return modelAndView;
+        }else {
+            modelAndView.addObject("signupErrors",errors);
+            modelAndView.setViewName("signup");
+            return modelAndView;
+        }
+
+    }
+
+    @RequestMapping(value = "/confirmEmail")
+    public ModelAndView confirmEmail(@RequestParam("email")String email,
+                                     @RequestParam("userType")String userType,
+                                     @RequestParam("v")String verificationCode,
+                                     @RequestParam("code")String code) {
+        ModelAndView modelAndView = new ModelAndView();
+        verificationCode = Convert.fromHexString(verificationCode);
+        if(verificationCode.equals(code)){
+            if(userType.equalsIgnoreCase("customer")){
+                customerService.updateCustomerState(UserState.WAITING_FOR_CONFIRM,email);
+            }else{
+                specialistService.updateSpecialistState(UserState.WAITING_FOR_CONFIRM,email);
+            }
+            modelAndView.setViewName("userRegisteredSuccessfullyPage");
+            return modelAndView;
+        }else {
+            if(userType.equalsIgnoreCase("customer")){
+                customerService.delete(email);
+            }else {
+                specialistService.delete(email);
+            }
+            modelAndView.setViewName("signup");
+            modelAndView.addObject("userDto", new UserDto());
+            modelAndView.addObject("emailNotValid","your email is not valid, please try again!");
+            return modelAndView;
+        }
+
     }
 
     @RequestMapping("/signIn")
@@ -57,13 +111,16 @@ public class UserController {
     @PostMapping("/login")
     public ModelAndView userLoginEvaluation(@RequestParam("email") String email,
                                             @RequestParam("password") String password,
-                                            @RequestParam("userType") String userType) {
+                                            @RequestParam("userType") String userType,
+                                            HttpServletRequest httpServletRequest){
 
         ModelAndView modelAndView = new ModelAndView();
-
+        HttpSession session;
         if(userType.equalsIgnoreCase("customer")){
             Customer customer = customerService.findByEmailAndPassword(email, password);
             if (customer != null) {
+                session=httpServletRequest.getSession();
+                session.setAttribute("testSession","hello");
                 return getCustomerAccountModelAndView(modelAndView, customer,orderService);
             }
         }else if(userType.equalsIgnoreCase("specialist")){
@@ -118,6 +175,8 @@ public class UserController {
         return modelAndView;
     }
 
+
+
     @ExceptionHandler(value = CustomerNotFoundException.class)
     public ModelAndView loginExceptionHandler(CustomerNotFoundException ex) {
         Map<String, Object> model = new HashMap<>();
@@ -145,6 +204,31 @@ public class UserController {
         model.put("error", "this email has been used before!");
         model.put("userDto", new UserDto());
         return new ModelAndView("signup", model);
+    }
+
+    @ExceptionHandler(value = BindException.class)
+    public ModelAndView bindExceptionHandler(BindException ex, HttpServletRequest request) {
+        String lastView = (String) request.getSession().getAttribute(LastViewInterceptor.LAST_VIEW_ATTRIBUTE);
+        return new ModelAndView(lastView, ex.getBindingResult().getModel());
+    }
+
+    @ExceptionHandler(value = UserNotConfirmedException.class)
+    public ModelAndView handleUserNotConfirmedException(){
+        ModelAndView modelAndView = new ModelAndView();
+        String message = "you're not confirmed yet come back <br/> after you received our confirmation email!";
+        modelAndView.addObject("UserNotConfirmed",message);
+        modelAndView.setViewName("loginPage");
+        return modelAndView;
+    }
+
+    private String getRandomCode() {
+        Random random = new Random();
+        int randomNumber = random.nextInt();
+        if (randomNumber < 0) {
+            return getRandomCode();
+        } else {
+           return String.valueOf(randomNumber).substring(0, 5);
+        }
     }
 
 }
