@@ -16,9 +16,8 @@ import ir.maktab.exception.subServiceExceptions.SubServiceNotFoundException;
 import ir.maktab.service.interfaces.SubServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -127,16 +126,16 @@ public class SubServiceServiceImpl implements SubServiceService {
     @Override
     public List<String> getSpecialistSubServices(String email) {
         List<Specialist> specialists = specialistDao.findSpecialistByEmail(email);
-        if(!specialists.isEmpty()){
+        if (!specialists.isEmpty()) {
             Specialist specialist = specialists.get(0);
             return subServiceDao.findSubServiceNameBySpecialistId(specialist.getId());
-        }else throw new SpecialistNotFoundException();
+        } else throw new SpecialistNotFoundException();
     }
 
     @Override
     public List<SubServiceEntityDto> findSubServiceByServiceName(String serviceName) {
-        List<SubService> subServices = new ArrayList<>(subServiceDao.findSubServiceByServiceName(serviceName));
-        return subServices.stream()
+        Specification<SubService> specification = SubServiceDao.filterSubServiceByServiceName(serviceName);
+        return subServiceDao.findAll(specification).stream()
                 .map(SubServiceEntityMapper::toSubServiceEntityDto).collect(Collectors.toList());
     }
 
