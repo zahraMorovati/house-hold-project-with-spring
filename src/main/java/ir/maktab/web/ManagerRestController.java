@@ -17,13 +17,12 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/swagger")
+@RequestMapping("/rest")
 public class ManagerRestController {
 
     private final CustomerServiceImpl customerService;
     private final SpecialistServiceImpl specialistService;
     private final OrderServiceImpl orderService;
-
 
     @GetMapping("/listCustomer")
     public List<CustomerDto> getListCustomer() {
