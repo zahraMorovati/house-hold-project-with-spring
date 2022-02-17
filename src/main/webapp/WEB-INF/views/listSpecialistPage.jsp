@@ -40,7 +40,6 @@
             <th>email</th>
             <th>state</th>
             <th>registrationDate</th>
-            <th>add to subService</th>
             <th>confirmation</th>
 
         </tr>
@@ -51,11 +50,7 @@
                 <td>${each_one.email}</td>
                 <td>${each_one.state}</td>
                 <td>${each_one.registrationDate}</td>
-
-                <td>
-                    <a href="/manager/addToSubService?email=${each_one.email}">add to subServices</a>
-                </td>
-                <td><a href="/manager/confirmSpecialist?s=${each_one.email}&m=${managerEmail}">confirm user</a></td>
+                <td><a href="/manager/confirmSpecialist?s=${each_one.email}<%--&m=${managerEmail}--%>">confirm user</a></td>
             </tr>
         </c:forEach>
     </table>

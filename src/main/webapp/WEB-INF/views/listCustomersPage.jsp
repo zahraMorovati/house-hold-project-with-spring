@@ -10,7 +10,7 @@
     <h2>list customers</h2>
 
     <p style="color: #21ea21">${success}</p>
-    <form method="get" action="/manager/listCustomer?mEmail=${managerEmail}">
+    <form method="get" action="/manager/listCustomer<%--?mEmail=${managerEmail}--%>">
         <tr>
             <th>name:</th>
             <th> <input type="text" name="name" /></th>
@@ -31,7 +31,7 @@
             <th colspan="2"><input type="submit" value="Search"/></th>
         </tr>
         <br/><br/>
-        <input type="hidden" name="mEmail" value="${managerEmail} ">
+        <%--<input type="hidden" name="mEmail" value="${managerEmail} ">--%>
         <table border="1" cellpadding="5">
             <tr>
                 <th>Name</th>
@@ -49,10 +49,13 @@
                     <td>${each_one.email}</td>
                     <td>${each_one.state}</td>
                     <td>${each_one.registrationDate}</td>
-                    <td><a href="/manager/confirmCustomer?c=${each_one.email}&m=${managerEmail}">confirm user</a></td>
+                    <td><a href="/manager/confirmCustomer?c=${each_one.email}<%--&m=${managerEmail}--%>">confirm user</a></td>
                 </tr>
             </c:forEach>
         </table>
+
+        <br/>
+        <a href="/manager/dashbord/">back to dashbord</a>
     </form>
 </div>
 </body>

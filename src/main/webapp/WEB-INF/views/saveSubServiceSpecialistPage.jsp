@@ -9,7 +9,8 @@
 <body>
 <div align="center">
     <h2>list specialists</h2>
-
+    <p style="color:#ee2222;">${duplicatedSubService}</p>
+    <p style="color:#2fef2f;">${specialistSavedToSubService}</p>
     <form:form action="/specialist/newSubService" method="post">
         <table border="1" cellpadding="5">
             <tr>
@@ -27,7 +28,7 @@
                     <td>${each_one.price}</td>
                     <td>${each_one.explanations}</td>
                     <td>
-                        <a href="/specialist/saveSubService?email=${userDto.email}&subServiceName=${each_one.subServiceName}">select</a>
+                        <a href="/specialist/saveSubService?<%--email=${userDto.email}&--%>subServiceName=${each_one.subServiceName}">select</a>
                     </td>
                 </tr>
             </c:forEach>

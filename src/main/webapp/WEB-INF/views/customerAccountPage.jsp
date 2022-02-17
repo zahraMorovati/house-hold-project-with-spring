@@ -39,11 +39,12 @@
             </tr>
         </table>
         <br/> <br/>
-        <a href="/customer/addOrder?email=${userDto.email}">add order</a>
+        <a href="/customer/addOrder<%--?email=${userDto.email}--%>">add order</a>
         <br/>
         <p class="text-danger">${errorMaxReachedOrderNumber}</p>
         <p class="text-danger">${errorUserNotConfirmed}</p>
         <p class="text-danger">${errorBalanceIsNotEnough}</p>
+        <p class="text-danger">${timeoutError}</p>
         <br/><br/>
         <h2> customer order list</h2>
         <div class="table-responsive">
@@ -75,9 +76,9 @@
                         <td>${each_one.orderState}</td>
                         <td>${each_one.address}</td>
                         <td>${each_one.comment}</td>
-                        <td><a href="/customer/viewSuggestions?orderCode=${each_one.orderCode}&email=${userDto.email}" >view suggestions</a></td>
+                        <td><a href="/customer/viewSuggestions?orderCode=${each_one.orderCode}<%--&email=${userDto.email}--%>" >view suggestions</a></td>
                         <td>
-                            <a href="/customer/newComment?orderCode=${each_one.orderCode}&email=${userDto.email}">add comment</a>
+                            <a href="/customer/newComment?orderCode=${each_one.orderCode}<%--&email=${userDto.email}--%>">add comment</a>
                         </td>
                     </tr>
                 </c:forEach>
@@ -105,9 +106,9 @@
                         <td>${each_one.specialist}</td>
                         <td>${each_one.orderState}</td>
                         <td>
-                            <th><a href="/customer/paymentByBalance?orderCode=${each_one.orderCode}&email=${userDto.email}">pay by balance</a></th>
+                            <th><a href="/customer/paymentByBalance?orderCode=${each_one.orderCode}<%--&email=${userDto.email}--%>">pay by balance</a></th>
                             <th>
-                                <a href="/customer/paymentByCard?orderCode=${each_one.orderCode}&email=${userDto.email}">pay by card </a>
+                                <a href="/customer/paymentByCard?orderCode=${each_one.orderCode}<%--&email=${userDto.email}--%>">pay by card </a>
                             </th>
                         </td>
 

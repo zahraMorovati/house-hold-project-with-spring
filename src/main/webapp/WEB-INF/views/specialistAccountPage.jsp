@@ -54,7 +54,7 @@
             </table>
         </div>
         <br/><br/>
-        <a href="/specialist/newSubService?email=${userDto.email}">add subService</a>
+        <a href="/specialist/newSubService<%--?email=${userDto.email}--%>">add subService</a>
         <br/><br/>
         <p class="text-danger">${errorCompleteOrder}</p>
         <br/><br/>
@@ -87,7 +87,7 @@
                         <td>${each_one.customer}</td>
                         <td>${each_one.address}</td>
                         <td>${each_one.comment}</td>
-                        <td><a href="specialist/addSuggestion?orderCode=${each_one.orderCode}&email=${userDto.email}">add suggestion</a></td>
+                        <td><a href="/specialist/addSuggestion?orderCode=${each_one.orderCode}<%--&email=${userDto.email}--%>">add suggestion</a></td>
                     </tr>
                 </c:forEach>
             </table>
@@ -122,7 +122,7 @@
                         <td>${each_one.customer}</td>
                         <td>${each_one.address}</td>
                         <td>${each_one.comment}</td>
-                        <td><a href="/specialist/completeOrder?orderCode=${each_one.orderCode}&email=${userDto.email}">complete order</a></td>
+                        <td><a href="/specialist/completeOrder?orderCode=${each_one.orderCode}<%--&email=${userDto.email}--%>">complete order</a></td>
                     </tr>
                 </c:forEach>
             </table>

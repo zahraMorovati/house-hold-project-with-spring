@@ -18,26 +18,24 @@
             integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn"
             crossorigin="anonymous"
     />
-    <link href="/static/css/saveComment.css" rel="stylesheet">
-    <script src="/static/js/saveComment.js" type="text/javascript"></script>
+
+    <link href="/static/css/starRating.css" rel="stylesheet">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <form:form action="/customer/saveComment?orderCode=${orderCode}&email=${email}" method="post" modelAttribute="commentDto">
+    <form:form action="/customer/saveComment?orderCode=${orderCode}" method="post" modelAttribute="commentDto">
         <h3>Rate!</h3>
-        <%--<div class="rating left">
-            <div class="stars right">
-                <a class="star rated"></a>
-                <a class="star rated"></a>
-                <a class="star rated"></a>
-                <a class="star"></a>
-                <a class="star"></a>
-            </div>
-        </div>--%>
-        <form:input path="point"/> <br/>
+        <span class="star-rating">
+            <input type="radio" name="point" value="1"><i></i>
+            <input type="radio" name="point" value="2"><i></i>
+            <input type="radio" name="point" value="3"><i></i>
+            <input type="radio" name="point" value="4"><i></i>
+            <input type="radio" name="point" value="5"><i></i>
+        </span>
+        <br/>
         <form:input path="comment" type="text" placeholder="enter your comment ..."/>
         <br/>
         <input value="save" type="submit">

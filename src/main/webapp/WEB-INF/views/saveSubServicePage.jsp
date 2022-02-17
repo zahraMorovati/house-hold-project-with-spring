@@ -6,7 +6,10 @@
     <title>save subService</title>
 </head>
 <body>
-<form:form action="/manager/saveSubService?email=${email}" method="post" modelAttribute="newSubServiceObject" enctype="multipart/form-data">
+<form:form action="/manager/saveSubService" method="post" modelAttribute="newSubServiceObject" enctype="multipart/form-data">
+    <p style="color: #ee2222">${duplicatedSubService}</p>
+    <p style="color: #35e835">${subServiceSaved}</p>
+    <br/>
     <table border="0" cellpadding="5">
         <tr>
             <td>service: </td>

@@ -28,7 +28,7 @@
                     <td>${each_one.timeStart}</td>
                     <td>${each_one.workHour}</td>
                     <td>${each_one.suggestedPrice}</td>
-                    <td><a href="/customer/selectSuggestion?suggestionCode=${each_one.suggestionCode}&email=${email}&orderCode=${each_one.orderCode}">select suggestion</a></td>
+                    <td><a href="/customer/selectSuggestion?suggestionCode=${each_one.suggestionCode}<%--&email=${email}--%>&orderCode=${each_one.orderCode}">select suggestion</a></td>
                 </tr>
             </c:forEach>
         </table>

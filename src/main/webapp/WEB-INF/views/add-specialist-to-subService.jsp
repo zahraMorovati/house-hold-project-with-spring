@@ -3,7 +3,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>list subServices</title>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -31,27 +31,34 @@
                 });
             });
 
+                var table = document.getElementById('table');
+
+                for(var i = 1; i < table.rows.length; i++)
+                {
+                    table.rows[i].onclick = function()
+                    {
+                        document.getElementById("email").value = this.cells[2].innerHTML;
+                    };
+                }
+
+
         });
     </script>
-
 </head>
 <body>
 <div align="center">
-    <h2>New order</h2>
-
-    <form:form action="/customer/saveOrder" method="post" modelAttribute="orderDto">
-        <table border="0" cellpadding="5">
-            <p class="text-danger">${errorSuggestedPrice}</p>
-            <p class="text-danger">${saveOrderErrors}</p>
-            <tr hidden>
-                <td>${orderDto.customer}
-                    <form:hidden path="customer"/>
-                </td>
-            </tr>
+    <h2>list specialists</h2>
+    <p style="color: #ee2222">${duplicatedSubService}</p>
+    <p style="color: #ee2222">${errors}</p>
+    <p style="color: #2fef2f">${specialistAddedSuccessfully}</p>
+    <form:form action="/manager/add-specialist-to-subService">
+        <table>
             <tr>
-                <td>service:</td>
+                <td>
+                    service:
+                </td>
                 <td><select id="comboboxService" style="width:200px">
-                    <c:forEach var="service" items="${services }">
+                    <c:forEach var="service" items="${services}">
                         <option value="${service.value}">${service.value}</option>
                     </c:forEach>
                 </select></td>
@@ -59,52 +66,43 @@
             <tr>
                 <td>sub service:</td>
                 <td>
-                        <form:select path="subService" id="comboboxSubService" cssStyle="width: 200px"></form:select>
+                    <select name="subService" id="comboboxSubService" style="width: 200px"></select>
                 </td>
             </tr>
             <tr>
-                <td>suggestedPrice:</td>
-                <td><form:input path="suggestedPrice"/></td>
+                <td>customer:</td>
+                <td>
+                    <input name="email" id="email" style="width: 200px" >
+                </td>
             </tr>
             <tr>
-                <td>explanations:</td>
-                <td><form:input path="explanations"/></td>
+                <td colspan="2"><input type="submit" value="save" style="width: 200px"></td>
             </tr>
-            <tr>
-                <td>startDate:</td>
-                <td><input name="date" type="date"/></td>
-            </tr>
-            <tr>
-                <td colspan="2"> address:</td>
-            </tr>
-            <tr>
-                <td>city:</td>
-                <td><form:input path="city"/></td>
-            </tr>
-            <tr>
-                <td>city state:</td>
-                <td><form:input path="cityState"/></td>
-            </tr>
-            <tr>
-                <td>plaque:</td>
-                <td><form:input path="plaque"/></td>
-            </tr>
-            <tr>
-                <td>explanations:</td>
-                <td><form:input path="addressExplanations"/></td>
-            </tr>
-            <tr>
-                <td colspan="2"><input type="submit" value="Save"></td>
-            </tr>
+
         </table>
     </form:form>
+    <br/>
+    <table border="1" cellpadding="5" id="table">
+        <tr>
+            <th>name</th>
+            <th>family</th>
+            <th>email</th>
+            <th>state</th>
+            <th>registration date</th>
+
+        </tr>
+        <c:forEach items="${specialists}" var="each_one">
+            <tr>
+
+                <td>${each_one.name}</td>
+                <td>${each_one.family}</td>
+                <td>${each_one.email}</td>
+                <td>${each_one.state}</td>
+                <td>${each_one.registrationDate}</td>
+            </tr>
+        </c:forEach>
+    </table>
+
 </div>
-
-
-<script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
-        crossorigin="anonymous"
-></script>
 </body>
 </html>

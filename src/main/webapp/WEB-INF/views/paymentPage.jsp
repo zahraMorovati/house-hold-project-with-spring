@@ -18,11 +18,11 @@
     <div class="card px-4">
         <p class="h8 py-3">Payment Details</p>
 
-        <form:form action="/customer/savePaymentByCard?orderCode=${order.orderCode}&email=${userDto.email}" method="post" >
+        <form:form action="/customer/savePaymentByCard?orderCode=${order.orderCode}" method="post" >
             <div>Registration closes in <span id="time">01:00</span> minutes!</div>
             <script>
                 var timer = setTimeout(function() {
-                    window.location='timeout?email=${userDto.email}'
+                    window.location='timeout'
                 }, 1000*60);
             </script>
             <br/>

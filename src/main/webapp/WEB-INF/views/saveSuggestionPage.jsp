@@ -26,11 +26,14 @@
     <form:form action="/specialist/saveSuggestion" method="post" modelAttribute="suggestionDto" >
         <table border="0" cellpadding="5">
             <p class="text-danger">${error}</p>
-            <tr hidden>
+            <p class="text-danger">${saveSuggestionErrors}</p>
+            <p style="color: #2fef2f">${suggestionSaved}</p>
+            <a href="/specialist/dashbord/">back to dashbord</a>
+            <%--<tr hidden>
                 <td>${suggestionDto.specialistEmail}
                     <form:hidden path="specialistEmail"/>
                 </td>
-            </tr>
+            </tr>--%>
             <tr hidden>
                 <td>${suggestionDto.orderCode}
                     <form:hidden path="orderCode"/>

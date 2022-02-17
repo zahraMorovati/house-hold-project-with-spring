@@ -23,10 +23,12 @@
 <body>
 <div class="center">
 
-
-    <form:form action="/confirmEmail?email=${email}&userType=${userType}&v=${verificationCode}">
-        <p>we sent the verification code to your email</p>
+    <%--?email=${email}&userType=${userType}&v=${verificationCode}--%>
+    <form:form action="/confirmEmail">
+        <p>we sent the verification code to your email <br/> please check your email and enter the code.</p>
+        <br/>
         <input type="number" name="code"/>
+        <br/>
         <input type="submit" value="verify" id="verify"/>
         <p id="message"></p>
     </form:form>
