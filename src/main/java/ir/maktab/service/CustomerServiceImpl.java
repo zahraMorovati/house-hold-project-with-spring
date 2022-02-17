@@ -116,7 +116,7 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerDto> advancedFilterCustomers(String name, String family, String email, String startingRegistrationDate, String endingRegistrationDate, Integer minOrderNumber, Integer maxOrderNumber) {
 
         Date startingDate = toDate(startingRegistrationDate);
-        Date endingDate = toDate(startingRegistrationDate);
+        Date endingDate = toDate(endingRegistrationDate);
         int minNumber = 0;
         int maxNumber = 0;
         if (minOrderNumber != null) minNumber = minOrderNumber;
