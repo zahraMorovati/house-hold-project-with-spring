@@ -1,15 +1,11 @@
 package ir.maktab.web;
 
-import com.google.gson.Gson;
 import ir.maktab.data.dto.CommentDto;
 import ir.maktab.data.dto.OrderDto;
 import ir.maktab.data.dto.SuggestionDto;
 import ir.maktab.data.dto.UserDto;
 import ir.maktab.data.dto.mappers.CommentMapper;
-import ir.maktab.data.entity.Address;
-import ir.maktab.data.entity.Customer;
-import ir.maktab.data.entity.Order;
-import ir.maktab.data.entity.SubService;
+import ir.maktab.data.entity.*;
 import ir.maktab.data.validators.Validation;
 import ir.maktab.exception.customerExceptions.BalanceIsNotEnoughException;
 import ir.maktab.exception.orderExceptions.MaxReachedOrderNumberException;
@@ -17,8 +13,13 @@ import ir.maktab.exception.suggestionExceptions.SuggestedPriceIsHigherThanBasePr
 import ir.maktab.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,88 +39,102 @@ public class CustomerController {
     private final SuggestionServiceImpl suggestionService;
 
 
-    @GetMapping("/addOrder")
-    public ModelAndView addCustomerOrder(@RequestParam String email) {
-        return getAddOrderModelAndView(email);
+    @RequestMapping("/dashbord")
+    public ModelAndView backToDashbord(HttpServletRequest request) {
+        String email = (String) request.getSession().getAttribute("email");
+        Customer customer = customerService.findByEmail(email);
+        return UserController.getCustomerAccountModelAndView(new ModelAndView(),customer,orderService,request.getSession());
     }
 
-    private ModelAndView getAddOrderModelAndView(String email) {
+    @GetMapping("/addOrder")
+    public ModelAndView addCustomerOrder(/*@RequestParam String email*/) {
+        return getAddOrderModelAndView(/*email*/);
+    }
+
+    private ModelAndView getAddOrderModelAndView(/*String email*/) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("saveOrderPage");
-        Map<String, String> subServices = new HashMap<>();
-        /*serviceService.getServiceNames().forEach(i -> services.put(i.getName(), i.getName()));*/
-        subServiceService.getAllSubServices().forEach(i -> subServices.put(i.getSubServiceName(), i.getSubServiceName()));
-        OrderDto orderDto = OrderDto.builder().setCustomer(email).build();
-        /*mav.addObject("services", services);*/
-        mav.addObject("subServices", subServices);
-        mav.addObject("orderDto", orderDto);
+        Map<String, String> services = new HashMap<>();
+        serviceService.getServiceNames().forEach(i -> services.put(i.getName(), i.getName()));
+        /*OrderDto orderDto = OrderDto.builder().setCustomer(email).build();*/
+        mav.addObject("services", services);
+        mav.addObject("orderDto", new OrderDto());
         return mav;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/loadSubServiceByName/{name}", method = RequestMethod.GET)
-    public String loadSubServices(@PathVariable("name") String name) {
-        Gson gson = new Gson();
-        return gson.toJson(subServiceService.findSubServiceByServiceName(name));
     }
 
     @RequestMapping("/saveOrder")
     public ModelAndView saveCustomerOrder(@ModelAttribute(name = "orderDto") OrderDto orderDto,
-                                          @RequestParam(value = "date", required = false) String startDate) throws ParseException {
+                                          @RequestParam(value = "date", required = false) String startDate,
+                                          HttpServletRequest request) throws ParseException {
         ModelAndView modelAndView = new ModelAndView();
         String errors = Validation.onOrderDto(orderDto);
-        if(errors.equals("")){
+        Customer customer = getCustomerByEmailFromHttpRequest(request);
+        if (errors.equals("")) {
             try {
                 Date date = new SimpleDateFormat("yyyy-mm-dd").parse(startDate);
-                Customer customer = customerService.findByEmail(orderDto.getCustomer());
                 SubService subService = subServiceService.findByName(orderDto.getSubService());
-                Address address = new Address();
+                Address address = Address.builder().setCity(orderDto.getCity()).setCityState(orderDto.getCityState()).setPlaque(orderDto.getPlaque()).setExplanations(orderDto.getExplanations()).build();
                 orderService.addCustomerOrder(customer, subService, orderDto.getSuggestedPrice(), orderDto.getExplanations(), address, date);
-                return UserController.getCustomerAccountModelAndView(modelAndView, customer, orderService);
+                return UserController.getCustomerAccountModelAndView(modelAndView, customer, orderService, request.getSession());
 
             } catch (SuggestedPriceIsHigherThanBasePriceException basePriceException) {
-                modelAndView = getAddOrderModelAndView(orderDto.getCustomer());
-                modelAndView.addObject("errorSuggestedPrice", "suggested price is more than base price!");
-                return modelAndView;
+                return exceptionHandlerSuggestedPriceIsHighrThanBasePrice(/*orderDto*/);
             } catch (MaxReachedOrderNumberException maxReachedOrderNumberException) {
-                modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customerService.findByEmail(orderDto.getCustomer()), orderService);
-                modelAndView.addObject("errorMaxReachedOrderNumber", "you have too many unfinished orders!");
-                return modelAndView;
+                return exceptionHandlerMaxReachedOrderNumberException(request, customer);
             }
-        }else {
-           ModelAndView mav = getAddOrderModelAndView(orderDto.getCustomer());
-            mav.addObject("saveOrderErrors",errors);
+        } else {
+            ModelAndView mav = getAddOrderModelAndView();
+            mav.addObject("saveOrderErrors", errors);
             return mav;
         }
 
     }
 
+    private Customer getCustomerByEmailFromHttpRequest(HttpServletRequest request) {
+        String email = (String) request.getSession().getAttribute("email");
+        Customer customer = customerService.findByEmail(email);
+        return customer;
+    }
+
+    private ModelAndView exceptionHandlerMaxReachedOrderNumberException(HttpServletRequest request, Customer customer) {
+        ModelAndView modelAndView;
+        modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService, request.getSession());
+        modelAndView.addObject("errorMaxReachedOrderNumber", "you have too many unfinished orders!");
+        return modelAndView;
+    }
+
+    private ModelAndView exceptionHandlerSuggestedPriceIsHighrThanBasePrice(/*OrderDto orderDto*/) {
+        ModelAndView modelAndView;
+        modelAndView = getAddOrderModelAndView(/*orderDto.getCustomer()*/);
+        modelAndView.addObject("errorSuggestedPrice", "suggested price is more than base price!");
+        return modelAndView;
+    }
+
     @GetMapping("/viewSuggestions")
-    public ModelAndView viewSpecialistSuggestions(@RequestParam("orderCode") String orderCode,
-                                                  @RequestParam("email") String email) {
+    public ModelAndView viewSpecialistSuggestions(@RequestParam("orderCode") String orderCode) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("viewSuggestionPage");
         List<SuggestionDto> suggestions = suggestionService.findSuggestionByOrder(orderCode);
         modelAndView.addObject("suggestions", suggestions);
-        modelAndView.addObject("email", email);
         return modelAndView;
     }
 
     @RequestMapping("/selectSuggestion")
     public ModelAndView selectSpecialistSuggestion(@RequestParam("suggestionCode") String suggestionCode,
-                                                   @RequestParam("email") String customerEmail,
-                                                   @RequestParam("orderCode") String orderCode) {
+                                                   @RequestParam("orderCode") String orderCode,
+                                                   HttpServletRequest request) {
 
-        Customer customer = customerService.findByEmail(customerEmail);
+        Customer customer = getCustomerByEmailFromHttpRequest(request);
         orderService.selectSpecialistSuggestion(orderCode, suggestionCode);
-        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService);
+        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService, request.getSession());
     }
 
     @RequestMapping("/paymentByBalance")
     public ModelAndView balancePayment(@RequestParam("orderCode") String orderCode,
-                                       @RequestParam("email") String email) {
+                                       HttpServletRequest request) {
+        String email = (String) request.getSession().getAttribute("email");
         Customer customer = customerService.findByEmail(email);
-        ModelAndView modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService);
+        ModelAndView modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService, request.getSession());
         try {
             orderService.paymentByBalance(email, orderCode);
         } catch (BalanceIsNotEnoughException e) {
@@ -132,7 +147,8 @@ public class CustomerController {
 
     @GetMapping("/paymentByCard")
     public ModelAndView payment(@RequestParam("orderCode") String orderCode,
-                                @RequestParam("email") String email) {
+                                HttpServletRequest request) {
+        String email = (String) request.getSession().getAttribute("email");
         ModelAndView mav = new ModelAndView();
         mav.setViewName("paymentPage");
         Order order = orderService.findByOrderCode(orderCode);
@@ -145,20 +161,18 @@ public class CustomerController {
 
     @RequestMapping("/savePaymentByCard")
     public ModelAndView cardPayment(@RequestParam("orderCode") String orderCode,
-                                    @RequestParam("email") String email) {
-
+                                    HttpServletRequest request) {
+        String email = (String) request.getSession().getAttribute("email");
         orderService.paymentByCard(email, orderCode);
         Customer customer = customerService.findByEmail(email);
-        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService);
+        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService, request.getSession());
     }
 
     @GetMapping("/newComment")
-    public ModelAndView newComment(@RequestParam("orderCode") String orderCode,
-                                   @RequestParam("email") String email) {
+    public ModelAndView newComment(@RequestParam("orderCode") String orderCode) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("saveComment");
         mav.addObject("orderCode", orderCode);
-        mav.addObject("email", email);
         mav.addObject("commentDto", new CommentDto());
         return mav;
     }
@@ -166,21 +180,35 @@ public class CustomerController {
     @RequestMapping("/saveComment")
     public ModelAndView saveComment(@ModelAttribute("commentDto") CommentDto commentDto,
                                     @RequestParam("orderCode") String orderCode,
-                                    @RequestParam("email") String email,
-                                    @RequestParam("rating") int point) {
+                                    @RequestParam("point") Integer point,
+                                    HttpServletRequest request) {
+        String email = (String) request.getSession().getAttribute("email");
+        if (point == null) point = 0;
         commentDto.setPoint(point);
-        Order order = orderService.findByOrderCode(orderCode);
-        order.setComment(CommentMapper.toComment(commentDto));
-        orderService.save(order);
-        Customer customer = customerService.findByEmail(email);
-        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService);
+        String errors = Validation.onCommentDto(commentDto);
+        if (errors == "") {
+            Order order = orderService.findByOrderCode(orderCode);
+            order.setComment(CommentMapper.toComment(commentDto));
+            orderService.save(order);
+            Customer customer = customerService.findByEmail(email);
+            return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer,
+                    orderService, request.getSession());
+        } else {
+            ModelAndView modelAndView = newComment(orderCode);
+            modelAndView.addObject("errors", errors);
+            return modelAndView;
+        }
+
     }
 
     @GetMapping("/timeout")
-    public ModelAndView dashbord(@RequestParam("email") String email) {
-        System.out.println(email);
+    public ModelAndView dashbord(HttpServletRequest request) {
+        String email = (String) request.getSession().getAttribute("email");
         Customer customer = customerService.findByEmail(email);
-        return UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService);
+        ModelAndView modelAndView = UserController.getCustomerAccountModelAndView(new ModelAndView(), customer, orderService, request.getSession());
+        modelAndView.addObject("timeoutError", "your time is finished please try again!");
+        return modelAndView;
+
     }
 
 
