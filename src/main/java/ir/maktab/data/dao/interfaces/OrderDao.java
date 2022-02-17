@@ -2,6 +2,7 @@ package ir.maktab.data.dao.interfaces;
 
 import ir.maktab.data.entity.Address;
 import ir.maktab.data.entity.Order;
+import ir.maktab.data.entity.Service;
 import ir.maktab.data.entity.SubService;
 import ir.maktab.data.enums.OrderState;
 import org.springframework.data.jpa.domain.Specification;
@@ -53,21 +54,19 @@ public interface OrderDao extends PagingAndSortingRepository<Order, Integer>, Jp
     @Query(value = "update orders set specialist_id=:specialistId where orderCode=:orderCode", nativeQuery = true)
     void selectSpecialist(@Param("specialistId") int specialistId, @Param("orderCode") String orderCode);
 
-    static Specification<Order> filterOrders(Date startDate, Date endDate, OrderState orderState, String serviceName, String subServiceName) {
+    static Specification<Order> filterOrders(Date startDate, Date endDate, OrderState orderState, String subServiceName) {
         return (root, criteriaQuery, criteriaBuilder) -> {
 
             CriteriaQuery<Order> resultCriteria = criteriaBuilder.createQuery(Order.class);
             Join<Order, SubService> subServiceJoin = root.join("subService");
             List<Predicate> filterPredicates = new ArrayList<>();
 
-            if (orderState != null) {
-                filterPredicates.add(criteriaBuilder.equal(root.get("orderState"), orderState));
-            } else if (subServiceName != null && !subServiceName.isEmpty()) {
+            if (subServiceName != null && !subServiceName.isEmpty()) {
                 filterPredicates.add(criteriaBuilder.equal(subServiceJoin.get("subServiceName"), subServiceName));
-            } else if (serviceName != null && !serviceName.isEmpty()) {
-                filterPredicates.add(criteriaBuilder.equal(subServiceJoin.get("service.serviceName"), serviceName));
             } else if (startDate != null && endDate != null) {
                 filterPredicates.add(criteriaBuilder.between(root.get("registrationDate"), startDate, endDate));
+            }else if (orderState != null && !orderState.equals(OrderState.NO_STATE)) {
+                filterPredicates.add(criteriaBuilder.equal(root.get("orderState"), orderState));
             }
             resultCriteria.select(root).where(filterPredicates.toArray(new Predicate[0]));
             return resultCriteria.getRestriction();
